@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 static void get_next_char();
 static long double start();
@@ -95,6 +96,19 @@ static long double get_number()
 	long double acc = 0.0;
 	int decimalPointCount = 0;
 	long double negativePowerOfTen = 0.1;
+	bool unaryNegation = (look == '-');
+
+	if (look == '+' || look == '-')
+		get_next_non_whitespace_char();
+
+	if (look == '(') {
+		get_next_non_whitespace_char();
+		acc = start();
+		if (look != ')')
+			report_invalid_expression_and_abort();
+		get_next_non_whitespace_char();
+		return unaryNegation ? -acc : acc;
+	}
 
 	if (!isdigit(look) && (look != '.'))
 		report_invalid_expression_and_abort();
@@ -114,7 +128,7 @@ static long double get_number()
 
 	skip_white_space();
 
-	return acc;
+	return unaryNegation ? -acc : acc;
 }
 
 static void get_next_non_whitespace_char()
