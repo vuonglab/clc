@@ -14,7 +14,7 @@ static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
 
 int main(int argc, char **argv)
 {
-	const int expression_buf_size = 127+1;
+	const int expression_buf_size = 511+1;
 	char expression[expression_buf_size];
 
 	abort_if_no_expression_on_command_line(argc);
