@@ -1,9 +1,9 @@
-TARGET = whatis
+TARGET = clc
 
-$(TARGET): whatis.o evaluator.o
+$(TARGET): clc.o evaluator.o
 	gcc $^ -o $@
 
-whatis.o: whatis.c
+clc.o: clc.c
 	gcc -c $< -o $@
 
 evaluator.o: evaluator.c
