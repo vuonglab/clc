@@ -19,6 +19,16 @@ function assert_is_equal()
 	fi
 	local __exit_code=$?
 	
+	# Special handling for nan and -nan.
+	# On Linux, 0/0 gives -nan. On macOS and
+	# FreeBSD, it's nan.
+	if [ "$__answer_key" == "-nan" ]; then
+		__answer_key="nan"
+	fi
+	if [ "$__answer" == "-nan" ]; then
+		__answer="nan"
+	fi
+
 	if [ "$__answer" != "$__answer_key" ]; then
 		echo "ASSERT FAILED. EXPRESSION: $__expression ANSWER: $__answer KEY: $__answer_key"
 		num_assert_failed=$[num_assert_failed+1]
