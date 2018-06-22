@@ -34,7 +34,7 @@ static void abort_if_no_expression_on_command_line(int argc)
 	if (argc > 1)
 		return;
 
-	puts("whatis: missing elementary arithmetic expression\nTry 'whatis --help' for more information.");
+	puts("clc: missing elementary arithmetic expression\nTry 'clc --help' for more information.");
 	exit(EXIT_FAILURE);
 }
 
@@ -43,14 +43,14 @@ static void show_usage_if_requested_and_exit(int argc, char **argv)
 	if (argv[1] == NULL || strcmp(argv[1], "--help") != 0)
 		return;
 
-	puts("Usage: whatis expression");
+	puts("Usage: clc expression");
 	puts("Command-line elementary arithmetic calculator.");
 	puts("");
 	puts("Exxpression can contain +, -, *, x, /, (), and [].");
 	puts("");
 	puts("Examples:");
-	puts("  whatis [[6+2]x5-10]/3          Answer: 10");
-	puts("  whatis 52.1834*(5100+18)/85015 Answer: 3.1415");
+	puts("  clc [[6+2]x5-10]/3          Answer: 10");
+	puts("  clc 52.1834*(5100+18)/85015 Answer: 3.1415");
 
 	exit(EXIT_FAILURE);
 }

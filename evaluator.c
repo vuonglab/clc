@@ -142,6 +142,6 @@ static void abort_if_not_end_of_expression()
 
 static void report_invalid_expression_and_abort()
 {
-	puts("whatis: invalid elementary arithmetic expression\nTry 'whatis --help' for more information.");
+	puts("clc: invalid elementary arithmetic expression\nTry 'clc --help' for more information.");
 	exit(EXIT_FAILURE);
 }
