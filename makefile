@@ -1,7 +1,7 @@
 TARGET = clc
 
 $(TARGET): clc.o evaluator.o
-	gcc $^ -o $@
+	gcc clc.o evaluator.o -o $@
 
 clc.o: clc.c
 	gcc -c $< -o $@
