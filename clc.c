@@ -72,8 +72,7 @@ static void reconstruct_command_ine_to_get_expression(char *expression, char **a
 		if (*(argv+1) == NULL)
 			break;
 
-		if (expr_buf_size_remaining >= 1)
-			strcat(expression, " ");
+		strncat(expression, " ", expr_buf_size_remaining);
 		expr_buf_size_remaining--;
 
 		if (expr_buf_size_remaining < 0)
@@ -117,8 +116,10 @@ static void pretty_print_answer(long double answer)
 
 	// A: 5*0*9x6x3*2*8x3*5*5*1*2*7*2x6x6xmk3x4*9*-7x-3x-3*-7*7*-4*8*-9*-1*-7x6*-5*-4*-2x5*-7x5x-5*3*-4x-1*-8x4x-3*-3*-6x-5x0*2x1x-1x-7*-5 = -0
 	// B: -98/18/-78/93/-70/46 = -0.000000
-	if (strcmp(buffer, "-0") == 0)
-		strcpy(buffer, "0");
+	if (strcmp(buffer, "-0") == 0) {
+		puts("0");
+		return;
+	}
 
 	puts(buffer);
 }
