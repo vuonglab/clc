@@ -1,5 +1,6 @@
 TARGET = clc
 CC = cc
+PREFIX = /usr/local
 
 $(TARGET): clc.o evaluator.o
 	$(CC) clc.o evaluator.o -o $(TARGET)
@@ -12,3 +13,10 @@ clean:
 
 test:
 	./tests.sh
+
+install: $(TARGET)
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp $(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(TARGET)
