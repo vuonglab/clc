@@ -138,7 +138,8 @@ static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
 
 	int len = strlen(p);
 	p += (len-1);
-	for (int i=0; i<len; i++, p--) {
+	int i;
+	for (i=0; i<len; i++, p--) {
 		if (*p != '0' && *p != '.')
 			break;
 		*p = '\0';
