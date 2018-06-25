@@ -27,12 +27,8 @@ assert_is_equal()
 	# Special handling for nan and -nan.
 	# On Linux, 0/0 gives -nan. On macOS and
 	# FreeBSD, it's nan.
-	if [ "$__answer_key" = "-nan" ]; then
-		__answer_key="nan"
-	fi
-	if [ "$__answer" = "-nan" ]; then
-		__answer="nan"
-	fi
+	[ "$__answer_key" = "-nan" ] && __answer_key="nan"
+	[ "$__answer" = "-nan" ] && __answer="nan"
 
 	if [ "$__answer" != "$__answer_key" ]; then
 		echo "ASSERT FAILED. EXPRESSION: $__expression ANSWER: $__answer KEY: $__answer_key"
@@ -6399,8 +6395,4 @@ num_assert_failed=0
 run_all_test_cases
 
 echo $num_assert_total tests, $((num_assert_total-num_assert_failed)) passed, $num_assert_failed failed.
-if [ "$num_assert_failed" -ge 1 ] ; then
-	exit 1
-fi
-exit 0
-
+[ "$num_assert_failed" -eq 0 ] && exit 0 || exit 1
