@@ -11,7 +11,7 @@ $(TARGET): clc.o evaluator.o
 clean:
 	rm -f *.o *.a $(TARGET)
 
-test:
+test: $(TARGET)
 	./tests.sh
 
 install: $(TARGET)
