@@ -7,34 +7,34 @@
 
 assert_is_equal()
 {
-	local __expected_exit_code=$1
-	local __answer_key="$2"
+	local _expected_exit_code=$1
+	local _answer_key="$2"
 	shift 2
-	local __expression="$*"
+	local _expression="$*"
 
-	local __answer
+	local _answer
 
 	if [ "$#" -eq 0 ]; then
-		__answer=$(./clc)
+		_answer=$(./clc)
 	else
-		case "$__expression" in
-			*" * "*) __answer=$(./clc "$__expression") ;;
-			*) __answer=$(./clc $__expression) ;;
+		case "$_expression" in
+			*" * "*) _answer=$(./clc "$_expression") ;;
+			*) _answer=$(./clc $_expression) ;;
 		esac
 	fi
-	local __exit_code=$?
+	local _exit_code=$?
 	
 	# Special handling for nan and -nan.
 	# On Linux, 0/0 gives -nan. On macOS and
 	# FreeBSD, it's nan.
-	[ "$__answer_key" = "-nan" ] && __answer_key="nan"
-	[ "$__answer" = "-nan" ] && __answer="nan"
+	[ "$_answer_key" = "-nan" ] && _answer_key="nan"
+	[ "$_answer" = "-nan" ] && _answer="nan"
 
-	if [ "$__answer" != "$__answer_key" ]; then
-		echo "ASSERT FAILED. EXPRESSION: $__expression ANSWER: $__answer KEY: $__answer_key"
+	if [ "$_answer" != "$_answer_key" ]; then
+		echo "ASSERT FAILED. EXPRESSION: $_expression ANSWER: $_answer KEY: $_answer_key"
 		num_assert_failed=$((num_assert_failed+1))
-	elif [ "$__exit_code" -ne "$__expected_exit_code" ]; then
-		echo "ASSERT FAILED. EXPRESSION: $__expression EXIT CODE: $__exit_code EXPECTED: $__expected_exit_code"
+	elif [ "$_exit_code" -ne "$_expected_exit_code" ]; then
+		echo "ASSERT FAILED. EXPRESSION: $_expression EXIT CODE: $_exit_code EXPECTED: $_expected_exit_code"
 		num_assert_failed=$((num_assert_failed+1))
 	fi
 
@@ -43,13 +43,13 @@ assert_is_equal()
 
 run_no_expression_test_cases()
 {
-	local __missing_expression=
-	__missing_expression=$(printf "clc: missing elementary arithmetic expression\nTry 'clc --help' for more information.")
+	local _missing_expression=
+	_missing_expression=$(printf "clc: missing elementary arithmetic expression\nTry 'clc --help' for more information.")
 
-	assert_is_equal 1 "$__missing_expression"
-	assert_is_equal 1 "$__missing_expression" ""
-	assert_is_equal 1 "$__missing_expression" " "
-	assert_is_equal 1 "$__missing_expression" "  "
+	assert_is_equal 1 "$_missing_expression"
+	assert_is_equal 1 "$_missing_expression" ""
+	assert_is_equal 1 "$_missing_expression" " "
+	assert_is_equal 1 "$_missing_expression" "  "
 
 	assert_is_equal 1 "$invalid_expression" \"\"
 	assert_is_equal 1 "$invalid_expression" \" \"
@@ -58,11 +58,11 @@ run_no_expression_test_cases()
 
 run_help_test_cases()
 {
-	local __usage=
-	__usage=$(printf "Usage: clc expression\nCommand-line elementary arithmetic calculator.\n\nExpression can contain +, -, *, x, /, (), and [].\n\nExamples:\n  clc [[6+2]x5-10]/3          Answer: 10\n  clc 52.1834*(5100+18)/85015 Answer: 3.1415")
+	local _usage=
+	_usage=$(printf "Usage: clc expression\nCommand-line elementary arithmetic calculator.\n\nExpression can contain +, -, *, x, /, (), and [].\n\nExamples:\n  clc [[6+2]x5-10]/3          Answer: 10\n  clc 52.1834*(5100+18)/85015 Answer: 3.1415")
 
-	assert_is_equal 1 "$__usage" "--help"
-	assert_is_equal 1 "$__usage" "--help ignored"
+	assert_is_equal 1 "$_usage" "--help"
+	assert_is_equal 1 "$_usage" "--help ignored"
 
 	assert_is_equal 1 "$invalid_expression" "--Help"
 	assert_is_equal 1 "$invalid_expression" "--HELP"
@@ -76,24 +76,24 @@ run_help_test_cases()
 
 run_expression_buffer_test_cases()
 {
-	local __buffer_size=511 # must be odd number
-	local __buffer_too_small="Expression buffer too small."
+	local _buffer_size=511 # must be odd number
+	local _buffer_too_small="Expression buffer too small."
 
-	local __longest_expression=$(printf %$((__buffer_size-1))s1 | sed 's/  /1+/g')
-	assert_is_equal 0 $(((__buffer_size+1)/2)) $__longest_expression
-	assert_is_equal 1 "$__buffer_too_small" "X$__longest_expression"
+	local _longest_expression=$(printf %$((_buffer_size-1))s1 | sed 's/  /1+/g')
+	assert_is_equal 0 $(((_buffer_size+1)/2)) $_longest_expression
+	assert_is_equal 1 "$_buffer_too_small" "X$_longest_expression"
 
-	local __almost_max_buffer_size=$((__buffer_size-4))
-	local __almost_longest_expression=$(printf %$((__almost_max_buffer_size-1))s1 | sed 's/  /1+/g')
-	assert_is_equal 0 $(((__almost_max_buffer_size+1)/2+1)) "$__almost_longest_expression + 1"
-	assert_is_equal 0 $(((__almost_max_buffer_size+1)/2+1)) "$__almost_longest_expression + 1  "
-	assert_is_equal 0 $(((__almost_max_buffer_size+1)/2+1)) "$__almost_longest_expression +  1"
+	local _almost_max_buffer_size=$((_buffer_size-4))
+	local _almost_longest_expression=$(printf %$((_almost_max_buffer_size-1))s1 | sed 's/  /1+/g')
+	assert_is_equal 0 $(((_almost_max_buffer_size+1)/2+1)) "$_almost_longest_expression + 1"
+	assert_is_equal 0 $(((_almost_max_buffer_size+1)/2+1)) "$_almost_longest_expression + 1  "
+	assert_is_equal 0 $(((_almost_max_buffer_size+1)/2+1)) "$_almost_longest_expression +  1"
 
-	assert_is_equal 1 "$__buffer_too_small" "$__almost_longest_expression + 1+"
-	assert_is_equal 1 "$invalid_expression" "$__almost_longest_expression +1+"
+	assert_is_equal 1 "$_buffer_too_small" "$_almost_longest_expression + 1+"
+	assert_is_equal 1 "$invalid_expression" "$_almost_longest_expression +1+"
 
-	assert_is_equal 1 "$__buffer_too_small" "$__almost_longest_expression + 01"
-	assert_is_equal 1 "$__buffer_too_small" "$__almost_longest_expression + 01 +"
+	assert_is_equal 1 "$_buffer_too_small" "$_almost_longest_expression + 01"
+	assert_is_equal 1 "$_buffer_too_small" "$_almost_longest_expression + 01 +"
 }
 
 run_read_expression_test_cases()
