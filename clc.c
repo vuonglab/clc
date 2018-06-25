@@ -46,7 +46,7 @@ static void show_usage_if_requested_and_exit(int argc, char **argv)
 	puts("Usage: clc expression");
 	puts("Command-line elementary arithmetic calculator.");
 	puts("");
-	puts("Exxpression can contain +, -, *, x, /, (), and [].");
+	puts("Expression can contain +, -, *, x, /, (), and [].");
 	puts("");
 	puts("Examples:");
 	puts("  clc [[6+2]x5-10]/3          Answer: 10");
