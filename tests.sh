@@ -1,48 +1,54 @@
-#!/bin/bash
+#!/bin/sh
 
-function assert_is_equal()
+# Making scripts sh-compatible (portable):
+# https://unix.stackexchange.com/questions/145522/what-does-it-mean-to-be-sh-compatible
+# https://stackoverflow.com/questions/5725296/difference-between-sh-and-bash
+# https://mywiki.wooledge.org/Bashism
+
+assert_is_equal()
 {
 	local __expected_exit_code=$1
-	local __answer_key=$2
+	local __answer_key="$2"
 	shift 2
-	local __expression=$*
+	local __expression="$*"
 
 	local __answer
 
-	# http://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
 	if [ "$#" -eq 0 ]; then
 		__answer=$(./clc)
-	elif [[ "$__expression" == *" * "* ]]; then
-		__answer=$(./clc "$__expression")
 	else
-		__answer=$(./clc $__expression)
+		case "$__expression" in
+			*" * "*) __answer=$(./clc "$__expression") ;;
+			*) __answer=$(./clc $__expression) ;;
+		esac
 	fi
 	local __exit_code=$?
 	
 	# Special handling for nan and -nan.
 	# On Linux, 0/0 gives -nan. On macOS and
 	# FreeBSD, it's nan.
-	if [ "$__answer_key" == "-nan" ]; then
+	if [ "$__answer_key" = "-nan" ]; then
 		__answer_key="nan"
 	fi
-	if [ "$__answer" == "-nan" ]; then
+	if [ "$__answer" = "-nan" ]; then
 		__answer="nan"
 	fi
 
 	if [ "$__answer" != "$__answer_key" ]; then
 		echo "ASSERT FAILED. EXPRESSION: $__expression ANSWER: $__answer KEY: $__answer_key"
-		num_assert_failed=$[num_assert_failed+1]
+		num_assert_failed=$((num_assert_failed+1))
 	elif [ "$__exit_code" -ne "$__expected_exit_code" ]; then
 		echo "ASSERT FAILED. EXPRESSION: $__expression EXIT CODE: $__exit_code EXPECTED: $__expected_exit_code"
-		num_assert_failed=$[num_assert_failed+1]
+		num_assert_failed=$((num_assert_failed+1))
 	fi
 
-	num_assert_total=$[num_assert_total+1]
+	num_assert_total=$((num_assert_total+1))
 }
 
-function run_no_expression_test_cases()
+run_no_expression_test_cases()
 {
-	local __missing_expression="clc: missing elementary arithmetic expression"$'\n'"Try 'clc --help' for more information."
+	local __missing_expression=
+	__missing_expression=$(printf "clc: missing elementary arithmetic expression\nTry 'clc --help' for more information.")
 
 	assert_is_equal 1 "$__missing_expression"
 	assert_is_equal 1 "$__missing_expression" ""
@@ -54,9 +60,10 @@ function run_no_expression_test_cases()
 	assert_is_equal 1 "$invalid_expression" \"  \"
 }
 
-function run_help_test_cases()
+run_help_test_cases()
 {
-	local __usage="Usage: clc expression"$'\n'"Command-line elementary arithmetic calculator."$'\n\n'"Exxpression can contain +, -, *, x, /, (), and []."$'\n\n'"Examples:"$'\n'"  clc [[6+2]x5-10]/3          Answer: 10"$'\n'"  clc 52.1834*(5100+18)/85015 Answer: 3.1415"
+	local __usage=
+	__usage=$(printf "Usage: clc expression\nCommand-line elementary arithmetic calculator.\n\nExpression can contain +, -, *, x, /, (), and [].\n\nExamples:\n  clc [[6+2]x5-10]/3          Answer: 10\n  clc 52.1834*(5100+18)/85015 Answer: 3.1415")
 
 	assert_is_equal 1 "$__usage" "--help"
 	assert_is_equal 1 "$__usage" "--help ignored"
@@ -71,7 +78,7 @@ function run_help_test_cases()
 	assert_is_equal 1 "$invalid_expression" "1+1 --help"
 }
 
-function run_expression_buffer_test_cases()
+run_expression_buffer_test_cases()
 {
 	local __buffer_size=511 # must be odd number
 	local __buffer_too_small="Expression buffer too small."
@@ -93,7 +100,7 @@ function run_expression_buffer_test_cases()
 	assert_is_equal 1 "$__buffer_too_small" "$__almost_longest_expression + 01 +"
 }
 
-function run_read_expression_test_cases()
+run_read_expression_test_cases()
 {
 	assert_is_equal 0 6 "2 * 3"
 
@@ -150,7 +157,7 @@ function run_read_expression_test_cases()
 	assert_is_equal 1 "$invalid_expression" "[(1+2)*3-0 . 2]/20x3"
 }
 
-function run_bad_expression_test_cases()
+run_bad_expression_test_cases()
 {
 	assert_is_equal 1 "$invalid_expression" "+"
 	assert_is_equal 1 "$invalid_expression" \"  +\"
@@ -213,7 +220,7 @@ function run_bad_expression_test_cases()
 	assert_is_equal 1 "$invalid_expression" "3,141,592,653"
 }
 
-function run_brackets_test_cases()
+run_brackets_test_cases()
 {
 	assert_is_equal 0 8 "2*[3+1]"
 	assert_is_equal 0 8 "2*(3+1]"
@@ -248,7 +255,7 @@ function run_brackets_test_cases()
 	assert_is_equal 1 "$invalid_expression" "[10+2]/6]"
 }
 
-function run_xX_test_cases()
+run_xX_test_cases()
 {
 	assert_is_equal 0 84 "7x3x4"
 	assert_is_equal 0 84 "7X3X4"
@@ -266,7 +273,7 @@ function run_xX_test_cases()
 	assert_is_equal 1 "$invalid_expression" "7 x 3 4"
 }
 
-function run_pretty_print_test_cases()
+run_pretty_print_test_cases()
 {
 	assert_is_equal 0 3 "3"
 	assert_is_equal 0 3 "3."
@@ -311,7 +318,7 @@ function run_pretty_print_test_cases()
 	assert_is_equal 0 0.1415 "000.141500"
 }
 
-function run_multiple_unary_operators_at_beginning_of_expression_test_cases()
+run_multiple_unary_operators_at_beginning_of_expression_test_cases()
 {
 	assert_is_equal 1 "$invalid_expression" "++1"
 	assert_is_equal 1 "$invalid_expression" " ++1"
@@ -345,7 +352,7 @@ function run_multiple_unary_operators_at_beginning_of_expression_test_cases()
 	assert_is_equal 1 "$invalid_expression" "/-8"
 }
 
-function run_unary_operator_test_cases()
+run_unary_operator_test_cases()
 {
 	assert_is_equal 0 7 "+7"
 	assert_is_equal 0 1983 "+1983"
@@ -414,7 +421,7 @@ function run_unary_operator_test_cases()
 	assert_is_equal 1 "$invalid_expression" "-  1 00"
 }
 
-function run_one_number_precision_test_cases()
+run_one_number_precision_test_cases()
 {
 	assert_is_equal 0 5 "5"
 	assert_is_equal 0 226 "226"
@@ -508,7 +515,7 @@ function run_one_number_precision_test_cases()
 	assert_is_equal 1 "$invalid_expression" ".14.1.5."
 }
 
-function run_division_by_zero_test_cases()
+run_division_by_zero_test_cases()
 {
 	assert_is_equal 1 inf "1/0"
 	assert_is_equal 1 inf "3.1415 / 0"
@@ -524,7 +531,7 @@ function run_division_by_zero_test_cases()
 	assert_is_equal 1 -nan "4067/-637*-42*21*-51110/-99/15/-347/416/56x-5946/-10216/56/497x6126x51/0/-4/4597/-2962x9x7782/9583/-6519x-53/-111*-34x-71x-9563x13649233490/7x-8566x-397/-8141*0"
 }
 
-function run_addition_test_cases()
+run_addition_test_cases()
 {
 	assert_is_equal 0 1 "1"
 	assert_is_equal 0 87 "87"
@@ -1238,7 +1245,7 @@ function run_addition_test_cases()
 	assert_is_equal 0 -131599.850899 "-944 + 39.93223+79+(-6)+[-7534] + -3803.297+74 + 2035+(-98929) + -12.715299+305+(-88857.87811 + -31204.448542+4770)+[-9332+3584.5963 + -308.3618+536.310707+0.305] + 407+[-191 + -823 + -52.3324 + -434+(-72)+53.0 + 1136+[-53.97718 + -432.3]+1176.8+(-48)+642.8+690.55+(-88.54)+879.6 + 2+[-20]] + 1 + 3824.864096 + 8797+[-190]+(-21.925) + -70.7 + 8774 + -57 + 58357+692.2733 + 10 + -414 + -8960.1125+82.633769+52+5242 + 440 + -897+(-422) + 59 + 70 + 785 + 1722.94244+6.7+8353.62639 + 56 + -127.6 + -65.581+9034.9837"
 }
 
-function run_subtraction_test_cases()
+run_subtraction_test_cases()
 {
 	assert_is_equal 0 7 "7"
 	assert_is_equal 0 45 "45"
@@ -1960,7 +1967,7 @@ function run_subtraction_test_cases()
 	# assert_is_equal 0 21998998055885716432.606667 "923-765193554751692188-820 - 47.199337 - 3339 - 36.826 - 41.2 - 6298.4131 - -15-0-12 - 61-32 - 392.54-(-151.19 - -51.587 - 29) - -19.870517-17.785 - -323.134171 - 86-2272-(-97) - 877 - -16 - -6923737532650-130-969.10378-(-446 - 83.485874) - -876.836666-16175-9.62911-[-372.19251] - 424.769 - -63.351-(-423.51) - -7506.557263-(-3489.73964-[-4687.197]-[-704.897661]) - 597.7-591-[-685.55 - -92-[-21.5 - 0.6117]-(-1002.845286) - -175] - -163-[-228.303] - 54 - 38703-15852-8.5 - -2677-101.81-[-22764184686899952066]"
 }
 
-function run_addition_subtraction_test_cases()
+run_addition_subtraction_test_cases()
 {
 	assert_is_equal 0 8 "8"
 	assert_is_equal 0 66 "66"
@@ -2654,7 +2661,7 @@ function run_addition_subtraction_test_cases()
 	assert_is_equal 0 604037.909232 "58.6653 + 52376.93465 + 634-44.713525-[-187]+(-31+51246-9.899578 - 49.6-(-5780.12601-71.19+(-99)) - -776.2) - -370 + -35.0 - 43-(-371.919-[-872] - -78)-83-(-2.5) + -83 - 349.846 - 114.1 + 370.50384-3526 + 43089+(-5+28.151-[-21723.474-(-118-560.2401)] - 7267.7)-(-5031 + 144 + 172 - -230)+(-3743.79-228-96 - 928.67 + 52.6397-[-54 + 32] + -326-976.1389-[-254])-377 - 34 - 28.257675 - -6838 + -22215.344 + -22 - 27.62859 - -6079.591-[-43425-6262+(-15)] - -393947+736-30.319 + 632.46+[-65.1979-(-6056)]+(-84 - -501)"
 }
 
-function run_multiplication_test_cases()
+run_multiplication_test_cases()
 {
 	assert_is_equal 0 4 "4"
 	assert_is_equal 0 59 "59"
@@ -4084,7 +4091,7 @@ function run_multiplication_test_cases()
 	# assert_is_equal 0 -348985047719864310255788808445233524839429486503845912874741255705448258777037639116702958915346949181763361050844405948893871349102509476026032818971390060312336788615601022030215993138428360113.15886 "115.366x60975.9052*3954.4201 * 63x-481*49.1*66*3096.937*-5825.47782 * 23.1 * 133 * -90.4783 * -96.618x94291.59 x 283*-97.65*-24x-144.96238*86451 * -6257*6333 x 3837x300*81 x -2737x291 * 7x-93106.34406 * -22.45181x-420.0*607.576x62 * -822.474035x21.570959 * -99461 * 852 * -21.864*-94 x 10.223 x -748 x 413.40814*-45 x -938 x 44083448756168597277 * 8174 * 942x1.8*5241.31343 x 865.38*20953.369426*-247*17x-33.51993x9373.87x-706.235464x8417 x 425 x -7160x78.2 * 5936.745x-17.7*441.3 x -3383.490407 * 1647x528 x 81"
 }
 
-function run_division_test_cases()
+run_division_test_cases()
 {
 	assert_is_equal 0 0 "0"
 	assert_is_equal 0 90 "90"
@@ -4599,7 +4606,7 @@ function run_division_test_cases()
 	assert_is_equal 0 0 "-8600 / 37.69 / -50.278/2702 / 1.224121 / -901.2393 / -1651.744/683/-13.88/29/81339/32 / -9659/-6047/7182/89.915354/74/-81.464271 / -2726 / 56/-772.4/43.53/-2607.93/9766/263.184341 / -787/74 / -1079.672/161.725/734/26 / 29 / 3.398/-26.52913 / 93467/-20.32005/52/-17.3 / 457/948.477218 / 27/-6580294.81053/4.193 / 301 / -11408 / 1120/11.762/-1192.7563 / -38.23227 / -4231.4284 / -3711.223 / 4034.41481/-1769.314/6 / 33 / -8752.23/-15 / -7610/137.8/-479.379 / -807/714.96/-460.2746 / -432/11 / -16 / -200.71432/55"
 }
 
-function run_multiplication_division_test_cases()
+run_multiplication_division_test_cases()
 {
 	assert_is_equal 0 9 "9"
 	assert_is_equal 0 -5 "-5"
@@ -5474,7 +5481,7 @@ function run_multiplication_division_test_cases()
 	# assert_is_equal 0 -4876308387669184.596562 "432.7958*-507.20013/-17.6/-87.905344x-78/-3171.4479 * -3283.347 x 7 * -78 / 1084/-264.9489 x -4700.994x77/-40x78/-843.114/244.871*38905.13659 / -66.26487x65.47 x -79 * -779x-3487*3431.73*355/7399.946262*-6924.1 / 13 / 525.74/-88478.3*-708 / 948/-996.893*598.25*257 / 3854.3776 / 484.365*-64x-78/2309.6406/363.728329 / 79 / -503 * 99 / 2406.407 x -22.841277*1474x89.8848*-465x81/-935.62556x66 x -43.808 x -50089 * 84047.535358*-7.8 * 675 / 642567*-3901235.95/70/-57893 x 350.19027/-27.98917 / 1490 / -4869 x -550"
 }
 
-function run_addition_subtraction_multiplication_division_test_cases()
+run_addition_subtraction_multiplication_division_test_cases()
 {
 	assert_is_equal 0 7 "7"
 	assert_is_equal 0 72 "72"
@@ -6342,7 +6349,7 @@ function run_addition_subtraction_multiplication_division_test_cases()
 	# assert_is_equal 0 1362758573492530739.373921 "(2283.512 / (524.876555 + [-2468 - -53.993] * -6315) * 62 / 8394.579995 x 10.9-[-49750.762 + 683-5x75.696808-(-31 / -72)] x -200)x[441+946] / (-27 + -39.0+918.8623/-79.2 - -52 + 1027.174395 + -19562x555/2328)/-761.166 + [312625.538404+(-76.7475)]x-7059 x [94512 + 78.712 - 5089+21.533328 - 300] * [(-1528.380238 - -5015.249 / 9145.7456 / 9473)/[227.826 / -53135296797206+[-801.23-[-169.5814]+97.879-(-48.479)]+8438]-6922.57781]-495/-5186 / -895 - -87.221+8623*22.494687 * -8296 + -75.42/(5250-[-32]) x [43+8310]"
 }
 
-function run_input_output_test_cases()
+run_input_output_test_cases()
 {
 	run_no_expression_test_cases
 	run_help_test_cases
@@ -6358,7 +6365,7 @@ function run_input_output_test_cases()
 	run_pretty_print_test_cases
 }
 
-function run_expression_test_cases()
+run_expression_test_cases()
 {
 	run_multiple_unary_operators_at_beginning_of_expression_test_cases
 	run_unary_operator_test_cases
@@ -6378,20 +6385,20 @@ function run_expression_test_cases()
 	run_addition_subtraction_multiplication_division_test_cases
 }
 
-function run_all_test_cases()
+run_all_test_cases()
 {
 	run_input_output_test_cases
 	run_expression_test_cases
 }
 
-invalid_expression="clc: invalid elementary arithmetic expression"$'\n'"Try 'clc --help' for more information."
+invalid_expression=$(printf "clc: invalid elementary arithmetic expression\nTry 'clc --help' for more information.")
 
 num_assert_total=0
 num_assert_failed=0
 
 run_all_test_cases
 
-echo $num_assert_total tests, $[num_assert_total-num_assert_failed] passed, $num_assert_failed failed.
+echo $num_assert_total tests, $((num_assert_total-num_assert_failed)) passed, $num_assert_failed failed.
 if [ "$num_assert_failed" -ge 1 ] ; then
 	exit 1
 fi
