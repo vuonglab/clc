@@ -6,6 +6,8 @@ extern long double evaluate_expression(char *expression);
 
 static void abort_if_no_expression_on_command_line(int argc);
 static void show_usage_if_requested_and_exit(int argc, char **argv);
+static void show_floating_point_type_if_requested_and_exit(int argc, char **argv);
+static char* get_floating_point_type();
 static void reconstruct_command_ine_to_get_expression(char* expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
 static void pretty_print_answer(long double answer);
@@ -19,6 +21,7 @@ int main(int argc, char **argv)
 
 	abort_if_no_expression_on_command_line(argc);
 	show_usage_if_requested_and_exit(argc, argv);
+	show_floating_point_type_if_requested_and_exit(argc, argv);
 	reconstruct_command_ine_to_get_expression(expression, argv, expression_buf_size);
 	replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(expression);
 
@@ -53,6 +56,29 @@ static void show_usage_if_requested_and_exit(int argc, char **argv)
 	puts("  clc 52.1834*(5100+18)/85015 Answer: 3.1415");
 
 	exit(EXIT_FAILURE);
+}
+
+static void show_floating_point_type_if_requested_and_exit(int argc, char **argv)
+{
+	if (argv[1] == NULL || strcmp(argv[1], "--fp-type") != 0)
+		return;
+
+	char* fp_type = get_floating_point_type();
+	puts(fp_type);
+
+	exit(EXIT_FAILURE);
+}
+
+static char* get_floating_point_type()
+{
+	if (sizeof(long double) > sizeof(double))
+		return "long double";
+	else if (sizeof(long double) == sizeof(double))
+		return "double";
+	else if (sizeof(long double) == sizeof(float))
+		return "float";
+
+	return "unknown";
 }
 
 static void reconstruct_command_ine_to_get_expression(char *expression, char **argv, int expression_buf_size)

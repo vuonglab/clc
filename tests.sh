@@ -63,15 +63,52 @@ run_help_test_cases()
 
 	assert_is_equal 1 "$_usage" "--help"
 	assert_is_equal 1 "$_usage" "--help ignored"
+	assert_is_equal 1 "$_usage" "--help --fp-type"
+	assert_is_equal 1 "$_usage" "--help 1+1"
 
+	assert_is_equal 1 "$invalid_expression" "-h"
+	assert_is_equal 1 "$invalid_expression" "-h --fp-type"
+	assert_is_equal 1 "$invalid_expression" "-H"
+	assert_is_equal 1 "$invalid_expression" "-H --fp-type"
+
+	assert_is_equal 1 "$invalid_expression" "help"
+	assert_is_equal 1 "$invalid_expression" "-help"
 	assert_is_equal 1 "$invalid_expression" "--Help"
 	assert_is_equal 1 "$invalid_expression" "--HELP"
+	assert_is_equal 1 "$invalid_expression" "---help"
 
 	assert_is_equal 1 "$invalid_expression" \" --help\"
 	assert_is_equal 1 "$invalid_expression" \"--help \"
 	assert_is_equal 1 "$invalid_expression" \" --help \"
 	assert_is_equal 1 "$invalid_expression" \"--help ignored\"
 	assert_is_equal 1 "$invalid_expression" "1+1 --help"
+}
+
+run_floating_point_type_test_cases()
+{
+	local _floating_point_type
+	_floating_point_type=$(./clc --fp-type)
+
+	assert_is_equal 1 "$_floating_point_type" "--fp-type"
+	assert_is_equal 1 "$_floating_point_type" "--fp-type ignored"
+	assert_is_equal 1 "$_floating_point_type" "--fp-type --help"
+	assert_is_equal 1 "$_floating_point_type" "--fp-type 1+1"
+
+	assert_is_equal 1 "$invalid_expression" "-fp-type"
+	assert_is_equal 1 "$invalid_expression" "-fp-type --help"
+
+	assert_is_equal 1 "$invalid_expression" "fp-type"
+	assert_is_equal 1 "$invalid_expression" "-fp-type"
+	assert_is_equal 1 "$invalid_expression" "--fptype"
+	assert_is_equal 1 "$invalid_expression" "--floating-point-type"
+	assert_is_equal 1 "$invalid_expression" "--FP-TYPE"
+	assert_is_equal 1 "$invalid_expression" "---fp-type"
+
+	assert_is_equal 1 "$invalid_expression" \" --fp-type\"
+	assert_is_equal 1 "$invalid_expression" \"--fp-type \"
+	assert_is_equal 1 "$invalid_expression" \" --fp-type \"
+	assert_is_equal 1 "$invalid_expression" \"--fp-type ignored\"
+	assert_is_equal 1 "$invalid_expression" "1+1 --fp-type"
 }
 
 run_expression_buffer_test_cases()
@@ -6353,6 +6390,7 @@ run_input_output_test_cases()
 {
 	run_no_expression_test_cases
 	run_help_test_cases
+	run_floating_point_type_test_cases
 
 	run_expression_buffer_test_cases
 
