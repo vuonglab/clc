@@ -10,8 +10,8 @@ static void show_floating_point_type_if_requested_and_exit(int argc, char **argv
 static char* get_floating_point_type();
 static void reconstruct_command_ine_to_get_expression(char* expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
-static void pretty_print_answer(long double answer);
 static void replace_char(char *str, char orig, char new);
+static void pretty_print_answer(long double answer);
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
 
 int main(int argc, char **argv)
@@ -119,6 +119,13 @@ static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(c
 	replace_char(expression, 'X', '*');
 }
 
+static void replace_char(char *str, char orig, char new)
+{
+	char *match = str;
+	while ((match = strchr(match, orig)) != NULL)
+		*match++ = new;
+}
+
 static void pretty_print_answer(long double answer)
 {
 	const int buf_size = 1536;
@@ -148,13 +155,6 @@ static void pretty_print_answer(long double answer)
 	}
 
 	puts(buffer);
-}
-
-static void replace_char(char *str, char orig, char new)
-{
-	char *match = str;
-	while ((match = strchr(match, orig)) != NULL)
-		*match++ = new;
 }
 
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
