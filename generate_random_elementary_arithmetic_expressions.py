@@ -217,10 +217,10 @@ class GenerateInteger():
     # if None, integer length is randomly chosen from _integer_len_range
     _integer_len = None
     # 1 to 20 digits, max integer length 12345678901234567890
-    _integer_len_range = range(1, 20 + 1)
+    _integer_len_range = range(1, 19 + 1)
     _random_integer_len_distribution = [
-        0.05, 0.325, 0.325, 0.23, 0.04, 0.011, 0.006, 0.001, 0.001, 0.001,
-        0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001
+        0.0500, 0.3270, 0.3260, 0.2310, 0.0410, 0.0110, 0.0062, 0.0012, 0.0011, 0.0010,
+        0.0009, 0.0008, 0.0007, 0.0006, 0.0005, 0.0004, 0.0003, 0.0002, 0.0001
     ]
     assert len(_integer_len_range) == len(_random_integer_len_distribution)
     assert sum(_random_integer_len_distribution) == 1.0
@@ -282,7 +282,7 @@ class GenerateInteger():
             self.value = sign * random.randint(integer_range[0],
                                                integer_range[1])
             if (self._avoid_many_zeroes == False
-                or self.value != 0 or random.random() <= 0.01):
+                or self.value != 0 or random.random() <= 0.001):
                 break
 
     def __str__(self):
