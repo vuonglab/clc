@@ -1,3 +1,7 @@
 *.o
-trashable/*
-whatis
+trashable/
+clc
+ans*
+backup/
+tocheck/
+decimal-places-vs-commented-out*
