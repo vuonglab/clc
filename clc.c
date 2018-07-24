@@ -55,7 +55,7 @@ static void show_usage_if_requested_and_exit(int argc, char **argv)
 	puts("  clc [[6+2]x5-10]/3          Answer: 10");
 	puts("  clc 52.1834*(5100+18)/85015 Answer: 3.1415");
 
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
 
 static void show_floating_point_type_if_requested_and_exit(int argc, char **argv)
@@ -66,7 +66,7 @@ static void show_floating_point_type_if_requested_and_exit(int argc, char **argv
 	char* fp_type = get_floating_point_type();
 	puts(fp_type);
 
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
 
 static char* get_floating_point_type()
