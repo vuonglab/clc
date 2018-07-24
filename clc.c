@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,8 @@ static void reconstruct_command_ine_to_get_expression(char* expression, char **a
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
 static void replace_char(char *str, char orig, char new);
 static void pretty_print_answer(long double answer);
+static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
+static int get_mantissa(char *buffer);
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
 
 int main(int argc, char **argv)
@@ -128,9 +131,40 @@ static void replace_char(char *str, char orig, char new)
 
 static void pretty_print_answer(long double answer)
 {
+	// https://www.tutorialspoint.com/cprogramming/c_data_types.htm
+	// float: 6 decimal places; double: 15 decimal places; long double: 19 decimal places
+
+	// warning: integer constant is so large that it is unsigned
+	// -9522868949551080827L // len 19, without the negative sign - overflow
+	// 10000000000000000000L // len 20 - overflow
+	// 9999999999999999999L // len 19 - overflow
+
+	// No warning about integer constant too large
+	// 9000000000000000000L // no overflow
+
+    const int num_digits = 19-1;
+
 	const int buf_size = 1536;
 	char buffer[buf_size];
-	int n = snprintf(buffer, buf_size, "%Lf", answer);
+	snprintf_with_exit(buffer, buf_size, "%.*Le", num_digits, answer);
+
+	if ((strcmp(buffer, "inf") != 0 && strcmp(buffer, "-inf") != 0) &&
+		(strcmp(buffer, "nan") != 0 && strcmp(buffer, "-nan") != 0)) {
+		int mantissa = get_mantissa(buffer);
+		if (-3 <= mantissa && mantissa <= 14)
+			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa, answer);
+	}
+
+	remove_trailing_zeros_in_decimal_fraction(buffer);
+	if (strcmp(buffer, "-0") == 0)
+		strcpy(buffer, "0");
+
+	puts(buffer);
+}
+
+static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer)
+{
+	int n = snprintf(buffer, buf_size, fmt, precision, answer);
 	if (n >= buf_size) {
 		puts("Answer buffer too small.");
 		exit(EXIT_FAILURE);
@@ -139,22 +173,22 @@ static void pretty_print_answer(long double answer)
 		puts("Internal format error.");
 		exit(EXIT_FAILURE);
 	}
-	if ((strcmp(buffer, "inf")==0 || strcmp(buffer, "-inf")==0) ||
-		(strcmp(buffer, "nan")==0 || strcmp(buffer, "-nan")==0)) {
-		puts(buffer);
+}
+
+static int get_mantissa(char *buffer)
+{
+	char *e = strchr(buffer, 'e');
+	if (e == NULL) {
+		printf("Mantissa not found: %s\n", buffer);
 		exit(EXIT_FAILURE);
 	}
-
-	remove_trailing_zeros_in_decimal_fraction(buffer);
-
-	// A: 5*0*9x6x3*2*8x3*5*5*1*2*7*2x6x6xmk3x4*9*-7x-3x-3*-7*7*-4*8*-9*-1*-7x6*-5*-4*-2x5*-7x5x-5*3*-4x-1*-8x4x-3*-3*-6x-5x0*2x1x-1x-7*-5 = -0
-	// B: -98/18/-78/93/-70/46 = -0.000000
-	if (strcmp(buffer, "-0") == 0) {
-		puts("0");
-		return;
+	long mantissa_l = strtol(e+1, NULL,  10);
+	int mantissa = (int)mantissa_l;
+	if (errno == ERANGE || mantissa != mantissa_l) {
+		printf("Mantissa too big: %s\n", buffer);
+		exit(EXIT_FAILURE);
 	}
-
-	puts(buffer);
+	return mantissa;
 }
 
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
@@ -164,11 +198,22 @@ static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
 		return;
 
 	int len = strlen(p);
-	p += (len-1);
-	int i;
-	for (i=0; i<len; i++, p--) {
-		if (*p != '0' && *p != '.')
-			break;
-		*p = '\0';
+
+	char *e = strchr(buffer, 'e');
+	if (e != NULL) {
+		if (!(e > p))
+			return;
+		len = (e-p)/sizeof(char);
 	}
+
+	p += len;
+	int i;
+	for (i=0; i<len; i++, p--)
+		if (*(p-1) != '0' && *(p-1) != '.')
+			break;
+
+	if (e == NULL)
+		*p = '\0';
+	else
+		strcpy(p, e);
 }
