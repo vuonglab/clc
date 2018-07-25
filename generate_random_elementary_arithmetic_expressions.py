@@ -61,24 +61,21 @@ class OperandGenerator():
         ])
 
     @classmethod
-    def get_float_generator(cls, integer_part_len, fractional_part_len):
-        GenerateFloat().integer_part_len = integer_part_len
-        GenerateFloat().fractional_part_len = fractional_part_len
+    def get_float_generator(cls, float_len):
+        GenerateFloat().float_len = float_len
         return OperandGenerator([
             {'prob': 1.0, 'generator': GenerateFloat}
         ])
 
     @classmethod
     def get_integer_and_float_generator(cls, operators, integer_len,
-                                        float_integer_part_len,
-                                        float_fractional_part_len):
+                                        float_len):
         GenerateInteger().integer_len = integer_len
         if integer_len == 1 and (operators == Operators.MULTIPLICATION
             or operators == Operators.DIVISION
             or operators == Operators.MULTIPLICATION_DIVISION):
             GenerateInteger().avoid_many_zeroes = True
-        GenerateFloat().integer_part_len = float_integer_part_len
-        GenerateFloat().fractional_part_len = float_fractional_part_len
+        GenerateFloat().float_len = float_len
         return OperandGenerator([
             {'prob': 0.5, 'generator': GenerateInteger},
             {'prob': 0.5, 'generator': GenerateFloat}
@@ -297,125 +294,76 @@ class GenerateInteger():
 
 class GenerateFloat():
     # if None, integer part length is randomly chosen
-    # from _integer_part_len_range
-    _integer_part_len = None
-    # if None, float fractional part length is randomly chosen
-    # from _fractional_part_len_range
-    _fractional_part_len = None
+    # from _float_len_range
+    _float_len = None
 
-    # 1 to 14, max integer part length 12345678901234.123456
-    _integer_part_len_range = range(1, 14 + 1)
-    _random_integer_part_len_distribution = [
-        0.05, 0.325, 0.325, 0.236, 0.04, 0.011, 0.006,
-        0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001
+    _float_len_range = range(1, 19 + 1)
+    _random_float_len_distribution = [
+        0.1850, 0.1900, 0.2000, 0.2000, 0.2000, 0.0110, 0.0062, 0.0012, 0.0011, 0.0010,
+        0.0009, 0.0008, 0.0007, 0.0006, 0.0005, 0.0004, 0.0003, 0.0002, 0.0001
     ]
-    assert len(_integer_part_len_range) == \
-        len(_random_integer_part_len_distribution)
-    assert sum(_random_integer_part_len_distribution) == 1.0
+    assert len(_float_len_range) == \
+        len(_random_float_len_distribution)
+    assert round(sum(_random_float_len_distribution), 15) == 1.0
 
-    # 1 to 6, max fractional part length 0.123456
-    _fractional_part_len_range = range(1, 6 + 1)
-
-    _random_fractional_part_len = None
+    _num_decimals = 0
 
     @property
-    def integer_part_len(self):
-        return type(self)._integer_part_len
+    def float_len(self):
+        return type(self)._float_len
 
-    @integer_part_len.setter
-    def integer_part_len(self, val):
+    @float_len.setter
+    def float_len(self, val):
         if val == 99:
             val = None
         if val is not None:
-            assert val in self._integer_part_len_range
-        type(self)._integer_part_len = val
+            assert val in self._float_len_range
+        type(self)._float_len = val
 
     @property
-    def integer_part_len_range(self):
-        return type(self)._integer_part_len_range
+    def float_len_range(self):
+        return type(self)._float_len_range
 
-    @property
-    def fractional_part_len(self):
-        return type(self)._fractional_part_len
-
-    @fractional_part_len.setter
-    def fractional_part_len(self, val):
-        if val == 9:
-            val = None
-        if val is not None:
-            assert val in self._fractional_part_len_range
-        type(self)._fractional_part_len = val
-
-    @property
-    def fractional_part_len_range(self):
-        return type(self)._fractional_part_len_range
-
-    def _randomly_pick_integer_part_len(self):
-        random_integer_part_len = None
+    def _randomly_pick_float_len(self):
+        random_float_len = None
         r = random.random()
         cumulative = 0.0
-        for i in range(len(self._random_integer_part_len_distribution)):
-            cumulative += self._random_integer_part_len_distribution[i]
+        for i in range(len(self._random_float_len_distribution)):
+            cumulative += self._random_float_len_distribution[i]
             if r <= cumulative:
-                random_integer_part_len = i + 1
+                random_float_len = i + 1
                 break
-        assert random_integer_part_len is not None
-        return random_integer_part_len
+        assert random_float_len is not None
+        return random_float_len
 
     def __init__(self):
         super(GenerateFloat, self).__init__()
 
         sign = -1 if random.random() <= 0.5 else 1
 
-        if self._integer_part_len is None:
-            float_integer_part_len = self._randomly_pick_integer_part_len()
+        if self._float_len is None:
+            float_len = self._randomly_pick_float_len()
         else:
-            float_integer_part_len = self._integer_part_len
-        if float_integer_part_len == 1:
+            float_len = self._float_len
+        if float_len == 1:
             float_integer_part_range = (0, 9)
         else:
             float_integer_part_range = (
-                10 ** (float_integer_part_len - 1),
-                10**float_integer_part_len - 1
-            )
-
-        if self._fractional_part_len is None:
-            float_fractional_part_len = random.choice(
-                self._fractional_part_len_range
-            )
-            self._random_fractional_part_len = float_fractional_part_len
-        else:
-            float_fractional_part_len = self._fractional_part_len
-
-        if float_fractional_part_len == 1:
-            float_fractional_part_range = (0, 9)
-        else:
-            float_fractional_part_range = (
-                10 ** (float_fractional_part_len - 1),
-                10**float_fractional_part_len - 1
+                10 ** (float_len - 1),
+                10**float_len - 1
             )
 
         float_integer_part = random.randint(float_integer_part_range[0],
                                             float_integer_part_range[1])
-
-        while True:
-            float_fractional_part = random.randint(
-                float_fractional_part_range[0], float_fractional_part_range[1])
-            if (float_fractional_part_len == 1
-                or float_fractional_part % 10 != 0):
-                break
+        
+        self._num_decimals = random.randint(1, float_len)
 
         self.value = sign * (
-            float_integer_part
-            + float_fractional_part / 10**float_fractional_part_len
+            float_integer_part / 10**self._num_decimals
         )
 
     def __str__(self):
-        if self._fractional_part_len is None:
-            prec = self._random_fractional_part_len
-        else:
-            prec = self._fractional_part_len
-        return '{:.{prec}f}'.format(self.value, prec=prec)
+        return '{:.{prec}f}'.format(self.value, prec=self._num_decimals)
 
     def __len__(self):
         return len(self.__str__())
@@ -584,16 +532,11 @@ def show_help_and_exit(default_max_expression_len,
             max(GenerateInteger().integer_len_range)
         )
     )
-    print("-f, --float nn.n")
-    print("  Generates random floats of integer part length nn and fractional part length n.")
+    print("-f, --float nn")
+    print("  Generates random floats of length nn.")
     print("  nn: {}-{}, 99=random length. Default: 99".format(
-            min(GenerateFloat().integer_part_len_range),
-            max(GenerateFloat().integer_part_len_range)
-        )
-    )
-    print("   n: {}-{}, 9=random length. Default: 9".format(
-            min(GenerateFloat().fractional_part_len_range),
-            max(GenerateFloat().fractional_part_len_range)
+            min(GenerateFloat().float_len_range),
+            max(GenerateFloat().float_len_range)
         )
     )
     print("-o, --operators a|s|m|d|as|md|asmd")
@@ -603,7 +546,7 @@ def show_help_and_exit(default_max_expression_len,
     print("     d: division")
     print("    as: addition, subtraction")
     print("    md: multiplication, division")
-    print("  asmd: addition, subtraction, multiplication, division")
+    print("  asmd: addition, subtraction, multiplication, division (default)")
     print("-s, --space n")
     print("  Number of spaces around an operator. n: 0-{}. Default: 0-3 random."
           .format(max_number_of_spaces_around_operator))
@@ -622,8 +565,7 @@ def show_invalid_syntax_and_exit():
 
 def parse_cmd_line_options(argv):
     integer_len = None
-    float_integer_part_len = None
-    float_fractional_part_len = None
+    float_len = None
     operators = Operators.ADDITION_SUBTRACTION_MULTIPLICATION_DIVISION
     number_of_spaces_around_operator = None
     max_expression_len = 511
@@ -641,12 +583,9 @@ def parse_cmd_line_options(argv):
                 show_invalid_syntax_and_exit()
             integer_len = int(arg)
         elif opt in ("-f", "--float"):
-            _float_parts = arg.split('.')
-            if (len(_float_parts) != 2 or not _float_parts[0].isdigit()
-                or not _float_parts[1].isdigit()):
+            if arg is None or not arg.isdigit():
                 show_invalid_syntax_and_exit()
-            float_integer_part_len = int(_float_parts[0])
-            float_fractional_part_len = int(_float_parts[1])
+            float_len = int(arg)
         elif opt in ("-l", "--length"):
             if arg is None or not arg.isdigit():
                 show_invalid_syntax_and_exit()
@@ -681,8 +620,7 @@ def parse_cmd_line_options(argv):
 
     return {
         'integer_len': integer_len,
-        'float_integer_part_len': float_integer_part_len,
-        'float_fractional_part_len': float_fractional_part_len,
+        'float_len': float_len,
         'operators': operators,
         'number_of_spaces_around_operator': number_of_spaces_around_operator,
         'max_expression_len': max_expression_len
@@ -697,22 +635,18 @@ def main():
          params['number_of_spaces_around_operator'])
 
     if (params['integer_len'] is not None and
-            (params['float_integer_part_len'] is None
-            and params['float_fractional_part_len'] is None)):
+            params['float_len'] is None):
         operand_generator = OperandGenerator.get_integer_generator(
             params['integer_len'], params['operators'])
     elif (params['integer_len'] is None
-            and (params['float_integer_part_len'] is not None
-            and params['float_fractional_part_len'] is not None)):
+            and params['float_len'] is not None):
         operand_generator = OperandGenerator.get_float_generator(
-            params['float_integer_part_len'],
-            params['float_fractional_part_len']
+            params['float_len']
         )
     else:
         operand_generator = OperandGenerator.get_integer_and_float_generator(
             params['operators'], params['integer_len'],
-            params['float_integer_part_len'],
-            params['float_fractional_part_len']
+            params['float_len']
         )
 
     for expr_len in range(params['max_expression_len']):
