@@ -162,7 +162,7 @@ def get_answer_key_in_exponential_form(expression, num_decimal_places):
     else:
         e_answer = re.sub('e-(\d)$', r'e-0\1', e_answer)
         e_answer = re.sub('e(\d)$', r'e+0\1', e_answer)
-        e_answer = re.sub('e(\d\d)$', r'e+\1', e_answer)
+        e_answer = re.sub('e(\d\d+)$', r'e+\1', e_answer)
 
     return e_answer
 
