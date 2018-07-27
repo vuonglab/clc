@@ -14,7 +14,8 @@ static char* get_floating_point_type();
 static void reconstruct_command_ine_to_get_expression(char* expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
 static void replace_char(char *str, char orig, char new);
-static void pretty_print_answer(long double answer);
+static void pretty_print_answer(evaluation_result result);
+static int get_number_of_significant_digits_in_answer(evaluation_result result);
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
@@ -31,9 +32,8 @@ int main(int argc, char **argv)
 	replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(expression);
 
 	evaluation_result result = evaluate_expression(expression);
-	long double answer = result.answer;
 	
-	pretty_print_answer(answer);
+	pretty_print_answer(result);
 
 	exit(EXIT_SUCCESS);
 }
@@ -132,7 +132,7 @@ static void replace_char(char *str, char orig, char new)
 		*match++ = new;
 }
 
-static void pretty_print_answer(long double answer)
+static void pretty_print_answer(evaluation_result result)
 {
 	// https://www.tutorialspoint.com/cprogramming/c_data_types.htm
 	// float: 6 decimal places; double: 15 decimal places; long double: 19 decimal places
@@ -145,7 +145,9 @@ static void pretty_print_answer(long double answer)
 	// No warning about integer constant too large
 	// 9000000000000000000L // no overflow
 
-    const int num_digits = 19-0;
+	long double answer = result.answer;
+
+	int num_digits = get_number_of_significant_digits_in_answer(result);
 
 	const int buf_size = 1536;
 	char buffer[buf_size];
@@ -163,6 +165,17 @@ static void pretty_print_answer(long double answer)
 		strcpy(buffer, "0");
 
 	puts(buffer);
+}
+
+static int get_number_of_significant_digits_in_answer(evaluation_result result)
+{
+	// Number of digits is empirically determined from generating many
+	// random expressions and comparing answers from this program
+	// to calc (https://github.com/lcn2/calc), an arbitrary precision calculator.
+	if (result.expression_contains_multiplication_or_division)
+		return result.expression_contains_floats ? 13 : 16;
+	else
+		return result.expression_contains_floats ? 16 : 19;
 }
 
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer)
