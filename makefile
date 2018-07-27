@@ -5,7 +5,7 @@ PREFIX = /usr/local
 $(TARGET): clc.o evaluator.o
 	$(CC) clc.o evaluator.o -o $(TARGET)
 
-%.o: %.c
+%.o: %.c evaluation_result.h
 	$(CC) -c $< -o $@
 
 clean:

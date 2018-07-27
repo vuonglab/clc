@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+#include "evaluation_result.h"
+
 static void get_next_char();
 static long double start();
 static long double get_number();
@@ -21,13 +23,19 @@ char *_expression;
 bool _expression_contains_floats;
 bool _expression_contains_multiplication_or_division;
 
-long double evaluate_expression(char *expression)
+evaluation_result evaluate_expression(char *expression)
 {
 	abort_if_expression_starts_with_two_unary_operators(expression);
 	init(expression);
 	long double answer = start();
 	abort_if_not_end_of_expression();
-	return answer;
+
+	evaluation_result result;
+	result.answer = answer;
+	result.expression_contains_floats = _expression_contains_floats;
+	result.expression_contains_multiplication_or_division =
+		_expression_contains_multiplication_or_division;
+	return result;
 }
 
 static void init(char *expression)

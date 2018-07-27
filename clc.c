@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern long double evaluate_expression(char *expression);
+#include "evaluation_result.h"
+
+extern evaluation_result evaluate_expression(char *expression);
 
 static void abort_if_no_expression_on_command_line(int argc);
 static void show_usage_if_requested_and_exit(int argc, char **argv);
@@ -28,8 +30,9 @@ int main(int argc, char **argv)
 	reconstruct_command_ine_to_get_expression(expression, argv, expression_buf_size);
 	replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(expression);
 
-	long double answer = evaluate_expression(expression);
-
+	evaluation_result result = evaluate_expression(expression);
+	long double answer = result.answer;
+	
 	pretty_print_answer(answer);
 
 	exit(EXIT_SUCCESS);
@@ -142,7 +145,7 @@ static void pretty_print_answer(long double answer)
 	// No warning about integer constant too large
 	// 9000000000000000000L // no overflow
 
-    const int num_digits = 19-1;
+    const int num_digits = 19-0;
 
 	const int buf_size = 1536;
 	char buffer[buf_size];
