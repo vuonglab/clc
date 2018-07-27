@@ -18,6 +18,8 @@ static void skip_white_space();
 
 char look; // lookahead character
 char *_expression;
+bool _expression_contains_floats;
+bool _expression_contains_multiplication_or_division;
 
 long double evaluate_expression(char *expression)
 {
@@ -30,6 +32,8 @@ long double evaluate_expression(char *expression)
 
 static void init(char *expression)
 {
+	_expression_contains_floats = false;
+	_expression_contains_multiplication_or_division = false;
 	_expression = expression;
 	get_next_non_whitespace_char();
 }
@@ -66,10 +70,12 @@ static long double get_term()
 			case '*':
 				get_next_non_whitespace_char();
 				acc *= get_factor();
+				_expression_contains_multiplication_or_division = true;
 				break;
 			case '/':
 				get_next_non_whitespace_char();
 				acc /= get_factor();
+				_expression_contains_multiplication_or_division = true;
 				break;
 		}
 	}
@@ -119,11 +125,15 @@ static long double get_number()
 		if (look == '.') {
 			if (++decimalPointCount > 1)
 				report_invalid_expression_and_abort();
-		} else if (decimalPointCount == 1) {
-			acc += (look - '0') * negativePowerOfTen;
-			negativePowerOfTen /= 10.0;
-		} else 
-			acc = (acc * 10.0) + (look - '0');
+		} else {
+			int digit = look - '0';
+			if (decimalPointCount == 1) {
+				acc += digit * negativePowerOfTen;
+				_expression_contains_floats = true;
+				negativePowerOfTen /= 10.0;
+			} else 
+				acc = (acc * 10.0) + digit;
+		}
 
 		get_next_char();
 	}
