@@ -18,6 +18,7 @@ static void pretty_print_answer(evaluation_result result);
 static int get_number_of_significant_digits_in_answer(evaluation_result result);
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
+static int get_number_of_trailing_decimal_nines(char *answer);
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
 
 int main(int argc, char **argv)
@@ -156,8 +157,14 @@ static void pretty_print_answer(evaluation_result result)
 	if ((strcmp(buffer, "inf") != 0 && strcmp(buffer, "-inf") != 0) &&
 		(strcmp(buffer, "nan") != 0 && strcmp(buffer, "-nan") != 0)) {
 		int mantissa = get_mantissa(buffer);
-		if (-3 <= mantissa && mantissa <= num_digits)
+		if (-3 <= mantissa && mantissa <= num_digits) {
 			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa, answer);
+			int number_of_nines = get_number_of_trailing_decimal_nines(buffer);
+			if (number_of_nines >= 8) {
+				// handle answers like -8.408039999999999 (should be -8.40804)
+				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa-number_of_nines, answer);
+			}
+		}
 	}
 
 	remove_trailing_zeros_in_decimal_fraction(buffer);
@@ -205,6 +212,21 @@ static int get_mantissa(char *buffer)
 		exit(EXIT_FAILURE);
 	}
 	return mantissa;
+}
+
+static int get_number_of_trailing_decimal_nines(char *answer)
+{
+	char *p = strchr(answer, '.');
+	if (p == NULL)
+		return 0;
+
+	p = answer + strlen(answer);
+
+	int number_of_nines = 0;
+	while (*(--p) == '9')
+		++number_of_nines;
+		
+	return number_of_nines;
 }
 
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
