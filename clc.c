@@ -147,7 +147,7 @@ static void pretty_print_answer(evaluation_result result)
 
 	long double answer = result.answer;
 
-	int num_digits = get_number_of_significant_digits_in_answer(result);
+	int num_digits = get_number_of_significant_digits_in_answer(result)-1;
 
 	const int buf_size = 1536;
 	char buffer[buf_size];
@@ -156,7 +156,7 @@ static void pretty_print_answer(evaluation_result result)
 	if ((strcmp(buffer, "inf") != 0 && strcmp(buffer, "-inf") != 0) &&
 		(strcmp(buffer, "nan") != 0 && strcmp(buffer, "-nan") != 0)) {
 		int mantissa = get_mantissa(buffer);
-		if (-3 <= mantissa && mantissa <= 14)
+		if (-3 <= mantissa && mantissa <= num_digits)
 			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa, answer);
 	}
 
@@ -173,7 +173,7 @@ static int get_number_of_significant_digits_in_answer(evaluation_result result)
 	// random expressions and comparing answers from this program
 	// to calc (https://github.com/lcn2/calc), an arbitrary precision calculator.
 	if (result.expression_contains_multiplication_or_division)
-		return result.expression_contains_floats ? 13 : 16;
+		return result.expression_contains_floats ? 13 : 17;
 	else
 		return result.expression_contains_floats ? 16 : 19;
 }
