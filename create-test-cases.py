@@ -101,8 +101,11 @@ def evaluate_expression_using_clc(expr):
     result = subprocess.run(['./clc', expr], stdout=subprocess.PIPE)
     answer = re.sub('\n$', '', result.stdout.decode('utf-8'))
     exit_code = result.returncode
-    assert ((is_float(answer) or re.search('^-?(inf|nan)$', answer) != None)
-            and exit_code == 0)
+    # is_float() handles +/-inf and +/-nan
+    assert is_float(answer), \
+        "Unexpected clc answer: %r. Expression: %r" % (answer, expr)
+    assert exit_code == 0, \
+        "Exit code is %r, not 0. Expression: %r" % (exit_code, expr)
     return answer, exit_code
 
 
