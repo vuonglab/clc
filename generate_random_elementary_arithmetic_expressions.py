@@ -109,7 +109,7 @@ class OperatorGenerator():
                 if r <= cumulative:
                     spaces = spaces_key
                     break
-            assert spaces is not  None
+            assert spaces is not None
 
         return {
             'symbol': k,
@@ -171,7 +171,8 @@ class OperatorGenerator():
             }
         }
         operators_dict = switcher.get(operators, {})
-        assert any(operators_dict.values())
+        assert any(operators_dict.values()), \
+            "Bad operators %r" % operators
         return OperatorGenerator(
             operators_dict, num_of_spaces_around_operator
         )
@@ -242,7 +243,8 @@ class GenerateInteger():
         if val == 99:
             val = None
         if val is not None:
-            assert val in self._integer_len_range
+            assert val in self._integer_len_range, \
+                "%r not in %r" % (val, self._integer_len_range)
         type(self)._integer_len = val
 
     @property
@@ -321,7 +323,8 @@ class GenerateFloat():
         if val == 99:
             val = None
         if val is not None:
-            assert val in self._float_len_range
+            assert val in self._float_len_range, \
+                "%r not in %r" % (val, self._float_len_range)
         type(self)._float_len = val
 
     @property
@@ -484,7 +487,8 @@ class Expression(object):
     @classmethod
     def generate(cls, operand_generator, operator_generator,
                  desired_expression_len, max_attempts):
-        assert desired_expression_len >= 1
+        assert desired_expression_len >= 1, \
+            "Bad expression length: %r" % desired_expression_len
 
         for attempt in range(max_attempts):
             sub_expressions = []
