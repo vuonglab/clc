@@ -6,7 +6,7 @@ calculates the expected answers using another program, and generates a
 sh-compatible script function to call clc to test clc produces the correct
 answers.
 
-Syntax: ./create-test-cases.py expressions_filename
+Syntax: ./create-test-cases.py [-v, --verbose] expressions_filename
 
 Dependencies:
 calc - C-style arbitrary precision calculator (https://github.com/lcn2/calc);
@@ -20,11 +20,13 @@ import sys
 
 
 def main():
-    expr_filename = get_expr_filename_from_command_line()
+    expr_filename, verbose = get_expr_filename_from_command_line()
     expressions = read_in_all_expressions(expr_filename)
 
     output_filename = expr_filename + '.tests'
-    tossed_out_count = generate_script_function(output_filename, expressions)
+    tossed_out_count = generate_script_function(
+        output_filename, expressions, verbose
+    )
 
     total_expr_count = len(expressions)
     test_expr_count = total_expr_count - tossed_out_count
@@ -34,11 +36,22 @@ def main():
 
 
 def get_expr_filename_from_command_line():
-    if len(sys.argv) != 2:
+    expr_filename = None
+    if len(sys.argv) == 2 or len(sys.argv) == 3:
+        verbose = sys.argv[1] == '-v' or sys.argv[1] == '--verbose'
+        if verbose:
+            if len(sys.argv) == 3:
+                expr_filename = sys.argv[2]
+        else:
+            expr_filename = sys.argv[1]
+
+    if expr_filename == None:
+        script_name = os.path.basename(__file__)
         print("Missing name of file containing elementary math expressions.")
+        print("Syntax:", script_name, "[-v, --verbose] expressions_filename")
         sys.exit(1)
-    expr_filename = sys.argv[1]
-    return expr_filename
+
+    return expr_filename, verbose
 
 
 def read_in_all_expressions(expr_filename):
@@ -47,7 +60,7 @@ def read_in_all_expressions(expr_filename):
     return expressions
 
 
-def generate_script_function(output_filename, expressions):
+def generate_script_function(output_filename, expressions, verbose):
     commented_out_expr_count = 0
 
     basename = os.path.splitext(os.path.basename(output_filename))[0]
@@ -64,17 +77,18 @@ def generate_script_function(output_filename, expressions):
             if clc_answer == answer_key:
                 if clc_answer == full_answer_key:
                     write_out_expr_test_case(
-                        script_file, expr, answer_key, approximated, exit_code
+                        script_file, expr, answer_key, approximated,
+                        exit_code, verbose
                     )
                 else:
                     write_out_expr_test_case_rounded_key(
                         script_file, expr, full_answer_key, approximated,
-                        answer_key, exit_code
+                        answer_key, exit_code, verbose
                     )
             else:
                 comment_out_expr_test_case(
                     script_file, expr, full_answer_key, approximated,
-                    answer_key, clc_answer, exit_code
+                    answer_key, clc_answer, exit_code, verbose
                 )
                 commented_out_expr_count += 1
 
@@ -179,10 +193,15 @@ def run_calc(expression):
     return answer, approximated
 
 
-def write_out_expr_test_case(file, expr, answer_key, approximated, exit_code):
+def write_out_expr_test_case(file, expr, answer_key, approximated, exit_code,
+                             verbose):
     if approximated:
         file.write('\n')
-        file.write('#\t             Key: ' + answer_key + ' (approximated)\n')
+        file.write('#\t             Key: ' + answer_key + ' (approximated)')
+        if verbose:
+            num_digits = number_of_significant_digits(answer_key)
+            file.write(' (' + str(num_digits) + ')')
+        file.write('\n')
 
     file.write("\tassert_is_equal ")
     file.write(str(exit_code) + " ")
@@ -194,11 +213,15 @@ def write_out_expr_test_case(file, expr, answer_key, approximated, exit_code):
 
 
 def write_out_expr_test_case_rounded_key(file, expr, full_answer_key,
-                                         approximated, answer_key, exit_code):
+                                         approximated, answer_key, exit_code,
+                                         verbose):
     file.write('\n')
     file.write('#\t             Key: ' + full_answer_key)
     if approximated:
         file.write(' (approximated)')
+    if verbose:
+        num_digits = number_of_significant_digits(full_answer_key)
+        file.write(' (' + str(num_digits) + ')')
     file.write('\n')
 
     file.write("\tassert_is_equal ")
@@ -210,21 +233,36 @@ def write_out_expr_test_case_rounded_key(file, expr, full_answer_key,
 
 
 def comment_out_expr_test_case(file, expr, full_answer_key, approximated,
-                               answer_key, answer, exit_code):
+                               answer_key, answer, exit_code, verbose):
     file.write('\n')
     if full_answer_key != answer_key or approximated:
         file.write("#\t             Key: ")
         file.write(full_answer_key)
         if approximated:
             file.write(' (approximated)')
+        if verbose:
+            num_digits = number_of_significant_digits(full_answer_key)
+            file.write(' (' + str(num_digits) + ')')
         file.write('\n')
-    file.write("#\t          Answer: " + answer + '\n')
+    file.write("#\t          Answer: " + answer)
+    if verbose:
+        num_digits = number_of_significant_digits(answer)
+        file.write(' (' + str(num_digits) + ')')
+        file.write('\n')
 
     file.write("#\tassert_is_equal ")
     file.write(str(exit_code) + " ")
     file.write(answer_key + " ")
     file.write('"' + expr + '"\n')
     file.write('\n')
+
+
+def number_of_significant_digits(answer):
+    e_index = answer.find('e')
+    if e_index != -1:
+        answer = answer[:e_index]
+    digits = re.sub('[^0-9]', '', answer)
+    return len(digits)
 
 
 if __name__ == "__main__":
