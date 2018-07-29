@@ -19,6 +19,7 @@ static int get_number_of_significant_digits_in_answer(evaluation_result result);
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
 static int get_number_of_trailing_decimal_nines(char *answer);
+static int get_number_of_trailing_zeros_followed_by_a_nonzero(char *answer);
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
 
 int main(int argc, char **argv)
@@ -164,6 +165,11 @@ static void pretty_print_answer(evaluation_result result)
 				// handle answers like -8.408039999999999 (should be -8.40804)
 				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa-number_of_nines, answer);
 			}
+			int number_of_zeros = get_number_of_trailing_zeros_followed_by_a_nonzero(buffer);
+			if (number_of_zeros >= 8) {
+				// handle answers like -0.9400000000000001 (should be -0.94)
+				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa-number_of_zeros, answer);
+			}
 		}
 	}
 
@@ -227,6 +233,23 @@ static int get_number_of_trailing_decimal_nines(char *answer)
 		++number_of_nines;
 		
 	return number_of_nines;
+}
+
+static int get_number_of_trailing_zeros_followed_by_a_nonzero(char *answer)
+{
+	char *p = strchr(answer, '.');
+	if (p == NULL)
+		return 0;
+
+	p = answer + strlen(answer) - 1;
+	if (!('1' <= *p && *p <= '9'))
+		return 0;
+
+	int number_of_zeros = 0;
+	while (*--p == '0')
+		++number_of_zeros;
+		
+	return number_of_zeros;
 }
 
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
