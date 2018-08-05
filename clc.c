@@ -18,7 +18,7 @@ static void pretty_print_answer(evaluation_result result);
 static int get_number_of_significant_digits_in_answer(evaluation_result result);
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
-static int get_number_of_trailing_decimal_nines(char *answer);
+static int get_number_of_trailing_decimal_nines_and_non_nine(char *answer);
 static int get_number_of_trailing_zeros_followed_by_a_nonzero(char *answer);
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
 
@@ -161,7 +161,7 @@ static void pretty_print_answer(evaluation_result result)
 		if (-3 <= mantissa && mantissa <= num_decimal_places_e_form) {
 			int num_decimal_places = num_decimal_places_e_form - mantissa;
 			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places, answer);
-			int number_of_nines = get_number_of_trailing_decimal_nines(buffer);
+			int number_of_nines = get_number_of_trailing_decimal_nines_and_non_nine(buffer);
 			// 3-10
 			if (number_of_nines >= 10) {
 				// handle answers like -8.408039999999999 (should be -8.40804)
@@ -191,7 +191,7 @@ static int get_number_of_significant_digits_in_answer(evaluation_result result)
 	if (result.expression_contains_multiplication_or_division)
 		return result.expression_contains_floats ? 13 : 17;
 	else
-		return result.expression_contains_floats ? 16 : 19;
+		return result.expression_contains_floats ? 17 : 19;
 }
 
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer)
@@ -223,18 +223,29 @@ static int get_mantissa(char *buffer)
 	return mantissa;
 }
 
-static int get_number_of_trailing_decimal_nines(char *answer)
+static int get_number_of_trailing_decimal_nines_and_non_nine(char *answer)
 {
 	char *p = strchr(answer, '.');
 	if (p == NULL)
 		return 0;
 
-	p = answer + strlen(answer);
+	p = answer + strlen(answer) - 1;
+
+	bool ends_with_non_nine = false;
+	if ('0' <= *p && *p <= '8') {
+		ends_with_non_nine = true;
+		p--;
+	}
 
 	int number_of_nines = 0;
-	while (*(--p) == '9')
+	while (answer <= p && *p == '9') {
 		++number_of_nines;
-		
+		p--;
+	}
+
+	if (number_of_nines > 0 && ends_with_non_nine)
+		++number_of_nines;
+	
 	return number_of_nines;
 }
 
