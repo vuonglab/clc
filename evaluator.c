@@ -111,7 +111,7 @@ static long double get_number()
 {
 	long double acc = 0.0;
 	int decimalPointCount = 0;
-	long double negativePowerOfTen = 0.1;
+	long double decimalPointPowerOfTen = 10.0;
 	bool unaryNegation = (look == '-');
 
 	if (look == '+' || look == '-')
@@ -136,9 +136,9 @@ static long double get_number()
 		} else {
 			int digit = look - '0';
 			if (decimalPointCount == 1) {
-				acc += digit * negativePowerOfTen;
+				acc += digit / decimalPointPowerOfTen;
 				_expression_contains_floats = true;
-				negativePowerOfTen /= 10.0;
+				decimalPointPowerOfTen *= 10.0;
 			} else 
 				acc = (acc * 10.0) + digit;
 		}
