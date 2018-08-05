@@ -149,26 +149,29 @@ static void pretty_print_answer(evaluation_result result)
 
 	long double answer = result.answer;
 
-	int num_digits = get_number_of_significant_digits_in_answer(result)-1;
+	int num_decimal_places_e_form = get_number_of_significant_digits_in_answer(result)-1;
 
 	const int buf_size = 1536;
 	char buffer[buf_size];
-	snprintf_with_exit(buffer, buf_size, "%.*Le", num_digits, answer);
+	snprintf_with_exit(buffer, buf_size, "%.*Le", num_decimal_places_e_form, answer);
 
 	if ((strcmp(buffer, "inf") != 0 && strcmp(buffer, "-inf") != 0) &&
 		(strcmp(buffer, "nan") != 0 && strcmp(buffer, "-nan") != 0)) {
 		int mantissa = get_mantissa(buffer);
-		if (-3 <= mantissa && mantissa <= num_digits) {
-			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa, answer);
+		if (-3 <= mantissa && mantissa <= num_decimal_places_e_form) {
+			int num_decimal_places = num_decimal_places_e_form - mantissa;
+			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places, answer);
 			int number_of_nines = get_number_of_trailing_decimal_nines(buffer);
-			if (number_of_nines >= 8) {
+			// 3-10
+			if (number_of_nines >= 10) {
 				// handle answers like -8.408039999999999 (should be -8.40804)
-				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa-number_of_nines, answer);
+				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_nines, answer);
 			}
 			int number_of_zeros = get_number_of_trailing_zeros_followed_by_a_nonzero(buffer);
-			if (number_of_zeros >= 8) {
+			// 8-11
+			if (number_of_zeros >= 11) {
 				// handle answers like -0.9400000000000001 (should be -0.94)
-				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_digits-mantissa-number_of_zeros, answer);
+				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_zeros, answer);
 			}
 		}
 	}
