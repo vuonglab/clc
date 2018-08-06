@@ -167,11 +167,11 @@ static void pretty_print_answer(evaluation_result result)
 				// handle answers like -8.408039999999999 (should be -8.40804)
 				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_nines, answer);
 			}
-			int number_of_zeros = get_number_of_trailing_zeros_followed_by_a_nonzero(buffer);
-			// 8-11
-			if (number_of_zeros >= 11) {
+			int number_of_zeros_and_nonzero = get_number_of_trailing_zeros_followed_by_a_nonzero(buffer);
+			// 9-12
+			if (number_of_zeros_and_nonzero >= 12) {
 				// handle answers like -0.9400000000000001 (should be -0.94)
-				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_zeros, answer);
+				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_zeros_and_nonzero, answer);
 			}
 		}
 	}
@@ -231,20 +231,20 @@ static int get_number_of_trailing_decimal_nines_and_non_nine(char *answer)
 
 	p = answer + strlen(answer) - 1;
 
-	bool ends_with_non_nine = false;
+	int number_of_non_nines = 0;
 	if ('0' <= *p && *p <= '8') {
-		ends_with_non_nine = true;
-		p--;
+		++number_of_non_nines;
+		--p;
 	}
 
 	int number_of_nines = 0;
 	while (answer <= p && *p == '9') {
 		++number_of_nines;
-		p--;
+		--p;
 	}
 
-	if (number_of_nines > 0 && ends_with_non_nine)
-		++number_of_nines;
+	if (number_of_nines > 0)
+		number_of_nines += number_of_non_nines;
 	
 	return number_of_nines;
 }
@@ -263,7 +263,7 @@ static int get_number_of_trailing_zeros_followed_by_a_nonzero(char *answer)
 	while (*--p == '0')
 		++number_of_zeros;
 		
-	return number_of_zeros;
+	return number_of_zeros+1; // +1 for nonzero at the end of answer
 }
 
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
