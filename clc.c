@@ -171,7 +171,7 @@ static void pretty_print_answer(evaluation_result result)
 			trailing_zeros_result zeros_result = get_number_of_trailing_zeros_followed_by_a_nonzero(buffer);
 			int number_of_zeros_and_nonzero = zeros_result.zero_count + zeros_result.non_zero_count;
 			// 9-12
-			if (number_of_zeros_and_nonzero >= 9) {
+			if (number_of_zeros_and_nonzero >= 9 || (zeros_result.zero_count >= 4 && num_decimal_places >= 15)) {
 				// handle answers like -0.9400000000000001 (should be -0.94)
 				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_zeros_and_nonzero, answer);
 			}
@@ -191,7 +191,7 @@ static int get_number_of_significant_digits_in_answer(evaluation_result result)
 	// random expressions and comparing answers from this program
 	// to calc (https://github.com/lcn2/calc), an arbitrary precision calculator.
 	if (result.expression_contains_multiplication_or_division)
-		return result.expression_contains_floats ? 13 : 17;
+		return result.expression_contains_floats ? 17 : 17;
 	else
 		return result.expression_contains_floats ? 18 : 19;
 }
