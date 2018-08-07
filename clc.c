@@ -18,8 +18,7 @@ static void pretty_print_answer(evaluation_result result);
 static int get_number_of_significant_digits_in_answer(evaluation_result result);
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
-static trailing_nines_result get_number_of_trailing_decimal_nines_and_non_nine(char *answer);
-static trailing_zeros_result get_number_of_trailing_zeros_followed_by_a_nonzero(char *answer);
+static trailing_d_result get_number_of_trailing_d_followed_by_up_to_two_non_d(char *answer, char digit);
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
 
 int main(int argc, char **argv)
@@ -161,17 +160,17 @@ static void pretty_print_answer(evaluation_result result)
 		if (-3 <= mantissa && mantissa <= num_decimal_places_e_form) {
 			int num_decimal_places = num_decimal_places_e_form - mantissa;
 			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places, answer);
-			trailing_nines_result nines_result = get_number_of_trailing_decimal_nines_and_non_nine(buffer);
-			int number_of_nines = nines_result.nine_count + nines_result.non_nine_count;
+			trailing_d_result nines_result = get_number_of_trailing_d_followed_by_up_to_two_non_d(buffer, '9');
+			int number_of_nines = nines_result.d_count + nines_result.non_d_count;
 			// 3-10
-			if (number_of_nines >= 8 || (nines_result.nine_count == 4 && num_decimal_places >= 15)) {
+			if (number_of_nines >= 8 || (nines_result.d_count == 4 && num_decimal_places >= 15)) {
 				// handle answers like -8.408039999999999 (should be -8.40804)
 				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_nines, answer);
 			}
-			trailing_zeros_result zeros_result = get_number_of_trailing_zeros_followed_by_a_nonzero(buffer);
-			int number_of_zeros_and_nonzero = zeros_result.zero_count + zeros_result.non_zero_count;
+			trailing_d_result zeros_result = get_number_of_trailing_d_followed_by_up_to_two_non_d(buffer, '0');
+			int number_of_zeros_and_nonzero = zeros_result.d_count + zeros_result.non_d_count;
 			// 9-12
-			if (number_of_zeros_and_nonzero >= 9 || (zeros_result.zero_count >= 4 && num_decimal_places >= 15)) {
+			if (number_of_zeros_and_nonzero >= 9 || (zeros_result.d_count >= 4 && num_decimal_places >= 15)) {
 				// handle answers like -0.9400000000000001 (should be -0.94)
 				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_zeros_and_nonzero, answer);
 			}
@@ -225,9 +224,9 @@ static int get_mantissa(char *buffer)
 	return mantissa;
 }
 
-static trailing_nines_result get_number_of_trailing_decimal_nines_and_non_nine(char *answer)
+static trailing_d_result get_number_of_trailing_d_followed_by_up_to_two_non_d(char *answer, char digit)
 {
-	trailing_nines_result result = { .nine_count = 0, .non_nine_count = 0 };
+	trailing_d_result result = { .d_count = 0, .non_d_count = 0 };
 
 	char *p = strchr(answer, '.');
 	if (p == NULL)
@@ -235,60 +234,26 @@ static trailing_nines_result get_number_of_trailing_decimal_nines_and_non_nine(c
 
 	p = answer + strlen(answer) - 1;
 
-	int number_of_non_nines = 0, i;
+	int non_digit_count = 0, i;
 	for (i = 0; i < 2; i++)
-		if ('0' <= *p && *p <= '8') {
-			++number_of_non_nines;
+		if ('0' <= *p && *p <= '9' && *p != digit) {
+			++non_digit_count;
 			--p;
 		}
 
-	int number_of_nines = 0;
-	while (answer <= p && *p == '9') {
-		++number_of_nines;
+	int digit_count = 0;
+	while (answer <= p && *p == digit) {
+		++digit_count;
 		--p;
 	}
 
-	if (number_of_nines == 0)
-		number_of_non_nines = 0;
+	if (digit_count == 0)
+		non_digit_count = 0;
 	
-	result.nine_count = number_of_nines;
-	result.non_nine_count = number_of_non_nines;
+	result.d_count = digit_count;
+	result.non_d_count = non_digit_count;
 
 	return result;
-}
-
-static trailing_zeros_result get_number_of_trailing_zeros_followed_by_a_nonzero(char *answer)
-{
-	trailing_zeros_result result = { .zero_count = 0, .non_zero_count = 0 };
-
-	char *p = strchr(answer, '.');
-	if (p == NULL)
-		return result;
-
-	p = answer + strlen(answer) - 1;
-	if (!('1' <= *p && *p <= '9'))
-		return result;
-
-    --p;
-    int num_non_zero = 1;
-    if ('1' <= *p && *p <= '9') {
-        ++num_non_zero;
-        --p;
-    }
-
-    int number_of_zeros = 0;
-    while (*p == '0') {
-        ++number_of_zeros;
-        --p;
-    }
-        
-    if (number_of_zeros == 0)
-        num_non_zero = 0;
-    
-	result.zero_count = number_of_zeros;
-	result.non_zero_count = num_non_zero;
-
-    return result;
 }
 
 static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
