@@ -191,7 +191,7 @@ static int get_number_of_significant_digits_in_answer(evaluation_result result)
 	// random expressions and comparing answers from this program
 	// to calc (https://github.com/lcn2/calc), an arbitrary precision calculator.
 	if (result.expression_contains_multiplication_or_division)
-		return result.expression_contains_floats ? 17 : 17;
+		return result.expression_contains_floats ? 16 : 17;
 	else
 		return result.expression_contains_floats ? 18 : 19;
 }
