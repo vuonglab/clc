@@ -169,12 +169,9 @@ static void pretty_print_answer(evaluation_result result)
 			}
 			trailing_d_result zeros_result = get_number_of_trailing_d_followed_by_up_to_two_non_d(buffer, '0');
 			int number_of_zeros = zeros_result.d_count + zeros_result.non_d_count;
-			// 9-12
 			// Don't truncate -9170.0000000000029 and -508.00000000000087. 
-			if ((9 <= number_of_zeros && number_of_zeros <= num_decimal_places-1) || (zeros_result.d_count >= 4 && num_decimal_places >= 15)) {
-				// handle answers like -0.9400000000000001 (should be -0.94)
+			if (5 <= number_of_zeros && number_of_zeros <= num_decimal_places-1)
 				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_zeros, answer);
-			}
 		}
 	}
 
