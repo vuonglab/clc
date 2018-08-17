@@ -19,7 +19,7 @@ static int get_number_of_significant_digits_in_answer(evaluation_result result);
 static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
 static trailing_d_result get_number_of_trailing_d_followed_by_up_to_two_non_d(char *answer, char digit);
-static void remove_trailing_zeros_in_decimal_fraction(char* buffer);
+static void remove_trailing_zeros_in_decimal_fraction(char* buffer, int buf_size, bool keep_decimal_point);
 
 int main(int argc, char **argv)
 {
@@ -173,9 +173,11 @@ static void pretty_print_answer(evaluation_result result)
 		}
 	}
 
-	remove_trailing_zeros_in_decimal_fraction(buffer);
+	remove_trailing_zeros_in_decimal_fraction(buffer, buf_size, result.expression_contains_floats);
 	if (strcmp(buffer, "-0") == 0)
 		strcpy(buffer, "0");
+	if (strcmp(buffer, "-0.0") == 0)
+		strcpy(buffer, "0.0");
 
 	puts(buffer);
 }
@@ -252,11 +254,20 @@ static trailing_d_result get_number_of_trailing_d_followed_by_up_to_two_non_d(ch
 	return result;
 }
 
-static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
+static void remove_trailing_zeros_in_decimal_fraction(char* buffer, int buf_size, bool keep_decimal_point)
 {
 	char *p = strchr(buffer, '.');
-	if (p == NULL)
+	if (p == NULL) {
+		if (keep_decimal_point && strcmp(buffer, "nan") != 0 && strcmp(buffer, "-nan") != 0
+			&& strcmp(buffer, "inf") != 0 && strcmp(buffer, "-inf") != 0) {
+			if (strlen(buffer)+2+1 > buf_size) {
+				puts("Answer buffer too small.");
+				exit(EXIT_FAILURE);
+			}
+			strcat(buffer, ".0");
+		}
 		return;
+	}
 
 	int len = strlen(p);
 
@@ -272,6 +283,12 @@ static void remove_trailing_zeros_in_decimal_fraction(char* buffer)
 	for (i=0; i<len; i++, p--)
 		if (*(p-1) != '0' && *(p-1) != '.')
 			break;
+
+	if (keep_decimal_point && *p == '.') {
+		++p;
+		if (*p == '0')
+			++p;
+	}
 
 	if (e == NULL)
 		*p = '\0';
