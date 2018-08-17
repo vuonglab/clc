@@ -133,11 +133,11 @@ static long double get_number()
 		if (look == '.') {
 			if (++decimalPointCount > 1)
 				report_invalid_expression_and_abort();
+			_expression_contains_floats = true;
 		} else {
 			int digit = look - '0';
 			if (decimalPointCount == 1) {
 				acc += digit / decimalPointPowerOfTen;
-				_expression_contains_floats = true;
 				decimalPointPowerOfTen *= 10.0;
 			} else 
 				acc = (acc * 10.0) + digit;

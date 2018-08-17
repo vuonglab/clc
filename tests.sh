@@ -510,7 +510,7 @@ run_significant_digits_test_cases_float_addition_and_subtraction()
 	assert_is_equal 0 123456789012345.123  123456789012345.123
 	assert_is_equal 0 1234567890123456.12  1234567890123456.12
 	assert_is_equal 0 12345678901234567.1  12345678901234567.1
-	assert_is_equal 0 123456789012345671  123456789012345671.
+	assert_is_equal 0 123456789012345671.0  123456789012345671.
 
 	assert_is_equal 0 -1.12345678901234567 -1.12345678901234567
 	assert_is_equal 0 -123456.123456789012 -123456.123456789012
@@ -795,7 +795,7 @@ run_trim_trailing_zeros_after_decimal_point_decimals_test_cases()
 	assert_is_equal 0 987654321098765.0    987654321098765.000
 	assert_is_equal 0 9876543210987654.0   9876543210987654.00
 	assert_is_equal 0 98765432109876543.0  98765432109876543.0
-	assert_is_equal 0 987654321098765432 987654321098765432.
+	assert_is_equal 0 987654321098765432.0 987654321098765432.
 
 	assert_is_equal 0 98765432109876.5432 98765432109876.5432
 	assert_is_equal 0 98765432109876.5    98765432109876.5000
@@ -819,7 +819,7 @@ run_trim_trailing_zeros_after_decimal_point_decimals_test_cases()
 	assert_is_equal 0 -9.0                  -9.00000000000000000
 	assert_is_equal 0 -98765.0              -98765.0000000000000
 	assert_is_equal 0 -98765432109.0        -98765432109.0000000
-	assert_is_equal 0 -987654321098765432 -987654321098765432.
+	assert_is_equal 0 -987654321098765432.0 -987654321098765432.
 	assert_is_equal 0 -98765432109876.5     -98765432109876.5000
 	assert_is_equal 0 -9876543210987654.3   -9876543210987654.30
 
@@ -1019,7 +1019,7 @@ run_multiple_unary_operators_at_beginning_of_expression_test_cases()
 
 run_unusual_decimal_test_cases()
 {
-	assert_is_equal 0 314 314.
+	assert_is_equal 0 314.0 314.
 
 	assert_is_equal 0 314.15 "0314.15"
 	assert_is_equal 0 314.15 "000314.15"
