@@ -251,7 +251,7 @@ def comment_out_expr_test_case(file, expr, full_answer_key, approximated,
     if verbose:
         num_digits = number_of_significant_digits(answer)
         file.write(' (' + str(num_digits) + ')')
-        file.write('\n')
+    file.write('\n')
 
     file.write("#\tassert_is_equal ")
     file.write(str(exit_code) + " ")
