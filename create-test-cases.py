@@ -132,12 +132,18 @@ def evaluate_expression_using_calc(expr, clc_answer):
             answer_key = clc_answer
         else:
             answer_key = "indeter"
-    elif full_answer_key == clc_answer:
-        answer_key = full_answer_key
     else:
-        answer_key = get_answer_key_in_same_precision_as_clc_answer(
-            expr, clc_answer
-        )
+        if '.' in expr and '.' not in full_answer_key and 'e' not in full_answer_key:
+            full_answer_key += ".0"
+        if full_answer_key == clc_answer:
+            answer_key = full_answer_key
+        else:
+            answer_key = get_answer_key_in_same_precision_as_clc_answer(
+                expr, clc_answer
+            )
+            parsed_e_re_result = re.search('^(-?\d+)(e[+-]\d+)$', answer_key)
+            if parsed_e_re_result != None:
+                answer_key = parsed_e_re_result.group(1) + ".0" + parsed_e_re_result.group(2)
 
     return full_answer_key, answer_key, approximated
 
