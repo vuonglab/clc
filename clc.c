@@ -50,7 +50,7 @@ static void abort_if_no_expression_on_command_line(int argc)
 
 static void show_usage_if_requested_and_exit(int argc, char **argv)
 {
-	if (argv[1] == NULL || strcmp(argv[1], "--help") != 0)
+	if (argv[1] == NULL || (strcmp(argv[1], "-h") != 0 && strcmp(argv[1], "--help") != 0))
 		return;
 
 	puts("Usage: clc expression");
