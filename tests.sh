@@ -73,6 +73,9 @@ run_help_test_cases()
 	assert_is_equal 0 "$_usage" "--help --precision"
 	assert_is_equal 0 "$_usage" "--help 1+1"
 
+	assert_is_equal 1 "$invalid_expression" "h"
+	assert_is_equal 1 "$invalid_expression" "H"
+
 	assert_is_equal 1 "$invalid_expression" "--h"
 	assert_is_equal 1 "$invalid_expression" "---h"
 
@@ -116,6 +119,8 @@ run_display_precision_test_cases()
 	assert_is_equal 0 "$_precision" "--precision --help"
 	assert_is_equal 0 "$_precision" "--precision 1+1"
 
+	assert_is_equal 1 "$invalid_expression" "p"
+	assert_is_equal 1 "$invalid_expression" "P"
 	assert_is_equal 1 "$invalid_expression" "-P"
 	assert_is_equal 1 "$invalid_expression" "--PRECISION"
 	assert_is_equal 1 "$invalid_expression" "--Precision"
