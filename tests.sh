@@ -63,13 +63,16 @@ run_help_test_cases()
 
 	assert_is_equal 0 "$_usage" "--help"
 	assert_is_equal 0 "$_usage" "--help ignored"
-	assert_is_equal 0 "$_usage" "--help --fp-type"
+	assert_is_equal 0 "$_usage" "--help -p"
+	assert_is_equal 0 "$_usage" "--help --precision"
 	assert_is_equal 0 "$_usage" "--help 1+1"
 
 	assert_is_equal 1 "$invalid_expression" "-h"
-	assert_is_equal 1 "$invalid_expression" "-h --fp-type"
+	assert_is_equal 1 "$invalid_expression" "-h -p"
+	assert_is_equal 1 "$invalid_expression" "-h --precision"
 	assert_is_equal 1 "$invalid_expression" "-H"
-	assert_is_equal 1 "$invalid_expression" "-H --fp-type"
+	assert_is_equal 1 "$invalid_expression" "-H -p"
+	assert_is_equal 1 "$invalid_expression" "-H --precision"
 
 	assert_is_equal 1 "$invalid_expression" "help"
 	assert_is_equal 1 "$invalid_expression" "-help"
@@ -84,31 +87,50 @@ run_help_test_cases()
 	assert_is_equal 1 "$invalid_expression" "1+1 --help"
 }
 
-run_floating_point_type_test_cases()
+run_display_precision_test_cases()
 {
-	local _floating_point_type
-	_floating_point_type=$(./clc --fp-type)
+	local _precision
+	_precision=$(./clc --precision)
 
-	assert_is_equal 0 "$_floating_point_type" "--fp-type"
-	assert_is_equal 0 "$_floating_point_type" "--fp-type ignored"
-	assert_is_equal 0 "$_floating_point_type" "--fp-type --help"
-	assert_is_equal 0 "$_floating_point_type" "--fp-type 1+1"
+	assert_is_equal 0 "$_precision" "-p"
+	assert_is_equal 0 "$_precision" "-p --precision"
+	assert_is_equal 0 "$_precision" "-p ignored"
+	assert_is_equal 0 "$_precision" "-p --help"
+	assert_is_equal 0 "$_precision" "-p 1+1"
 
-	assert_is_equal 1 "$invalid_expression" "-fp-type"
-	assert_is_equal 1 "$invalid_expression" "-fp-type --help"
+	assert_is_equal 0 "$_precision" "--precision"
+	assert_is_equal 0 "$_precision" "--precision -p"
+	assert_is_equal 0 "$_precision" "--precision ignored"
+	assert_is_equal 0 "$_precision" "--precision --help"
+	assert_is_equal 0 "$_precision" "--precision 1+1"
 
-	assert_is_equal 1 "$invalid_expression" "fp-type"
-	assert_is_equal 1 "$invalid_expression" "-fp-type"
-	assert_is_equal 1 "$invalid_expression" "--fptype"
-	assert_is_equal 1 "$invalid_expression" "--floating-point-type"
-	assert_is_equal 1 "$invalid_expression" "--FP-TYPE"
-	assert_is_equal 1 "$invalid_expression" "---fp-type"
+	assert_is_equal 1 "$invalid_expression" "-P"
+	assert_is_equal 1 "$invalid_expression" "--PRECISION"
+	assert_is_equal 1 "$invalid_expression" "--Precision"
 
-	assert_is_equal 1 "$invalid_expression" \" --fp-type\"
-	assert_is_equal 1 "$invalid_expression" \"--fp-type \"
-	assert_is_equal 1 "$invalid_expression" \" --fp-type \"
-	assert_is_equal 1 "$invalid_expression" \"--fp-type ignored\"
-	assert_is_equal 1 "$invalid_expression" "1+1 --fp-type"
+	assert_is_equal 1 "$invalid_expression" "--p"
+	assert_is_equal 1 "$invalid_expression" "--p --help"
+
+	assert_is_equal 1 "$invalid_expression" "-precision"
+	assert_is_equal 1 "$invalid_expression" "-precision --help"
+
+	assert_is_equal 1 "$invalid_expression" "precision"
+	assert_is_equal 1 "$invalid_expression" "-precision"
+	assert_is_equal 1 "$invalid_expression" "--fp-type"
+	assert_is_equal 1 "$invalid_expression" "---p"
+	assert_is_equal 1 "$invalid_expression" "---precision"
+
+	assert_is_equal 1 "$invalid_expression" \" -p\"
+	assert_is_equal 1 "$invalid_expression" \"-p \"
+	assert_is_equal 1 "$invalid_expression" \" -p \"
+	assert_is_equal 1 "$invalid_expression" \"-p ignored\"
+	assert_is_equal 1 "$invalid_expression" "1+1 -p"
+
+	assert_is_equal 1 "$invalid_expression" \" --precision\"
+	assert_is_equal 1 "$invalid_expression" \"--precision \"
+	assert_is_equal 1 "$invalid_expression" \" --precision \"
+	assert_is_equal 1 "$invalid_expression" \"--precision ignored\"
+	assert_is_equal 1 "$invalid_expression" "1+1 --precision"
 }
 
 run_expression_buffer_test_cases()
@@ -1191,7 +1213,7 @@ run_input_output_test_cases()
 {
 	run_no_expression_test_cases
 	run_help_test_cases
-	run_floating_point_type_test_cases
+	run_display_precision_test_cases
 
 	run_expression_buffer_test_cases
 

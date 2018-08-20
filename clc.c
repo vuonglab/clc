@@ -9,7 +9,7 @@ extern evaluation_result evaluate_expression(char *expression);
 
 static void abort_if_no_expression_on_command_line(int argc);
 static void show_usage_if_requested_and_exit(int argc, char **argv);
-static void show_floating_point_type_if_requested_and_exit(int argc, char **argv);
+static void show_precision_if_requested_and_exit(int argc, char **argv);
 static char* get_floating_point_type();
 static void reconstruct_command_ine_to_get_expression(char* expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
 	abort_if_no_expression_on_command_line(argc);
 	show_usage_if_requested_and_exit(argc, argv);
-	show_floating_point_type_if_requested_and_exit(argc, argv);
+	show_precision_if_requested_and_exit(argc, argv);
 	reconstruct_command_ine_to_get_expression(expression, argv, expression_buf_size);
 	replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(expression);
 
@@ -65,9 +65,9 @@ static void show_usage_if_requested_and_exit(int argc, char **argv)
 	exit(EXIT_SUCCESS);
 }
 
-static void show_floating_point_type_if_requested_and_exit(int argc, char **argv)
+static void show_precision_if_requested_and_exit(int argc, char **argv)
 {
-	if (argv[1] == NULL || strcmp(argv[1], "--fp-type") != 0)
+	if (argv[1] == NULL || (strcmp(argv[1], "-p") != 0 && strcmp(argv[1], "--precision") != 0))
 		return;
 
 	char* fp_type = get_floating_point_type();
