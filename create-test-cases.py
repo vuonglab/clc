@@ -118,7 +118,12 @@ def is_float(string):
 
 
 def evaluate_expression_using_calc(expr, clc_answer):
-    full_answer_key, approximated = run_calc(expr)
+    has_float = '.' in expr
+    if 'e' in clc_answer:
+        e_expr = 'printf("%e", ' + expr + ')'
+        full_answer_key, approximated = get_answer_in_exponential_form(e_expr, has_float)
+    else:
+        full_answer_key, approximated = get_answer_in_real_form(expr, has_float)
 
     if full_answer_key == "Error 10001":
         full_answer_key += ": divide by zero"
@@ -133,17 +138,12 @@ def evaluate_expression_using_calc(expr, clc_answer):
         else:
             answer_key = "indeter"
     else:
-        if '.' in expr and '.' not in full_answer_key and 'e' not in full_answer_key:
-            full_answer_key += ".0"
         if full_answer_key == clc_answer:
             answer_key = full_answer_key
         else:
             answer_key = get_answer_key_in_same_precision_as_clc_answer(
                 expr, clc_answer
             )
-            parsed_e_re_result = re.search('^(-?\d+)(e[+-]\d+)$', answer_key)
-            if parsed_e_re_result != None:
-                answer_key = parsed_e_re_result.group(1) + ".0" + parsed_e_re_result.group(2)
 
     return full_answer_key, answer_key, approximated
 
@@ -170,13 +170,18 @@ def get_answer_key_in_real_form(expr, num_decimal_places):
     num_decimals = str(num_decimal_places)
     printf_expr = 'printf("%.' + num_decimals + 'f", ' + expr + ')'
     answer_key, approximated = run_calc(printf_expr)
-
     return answer_key
 
 
 def get_answer_key_in_exponential_form(expression, num_decimal_places):
-    expr = 'printf("%.' + str(num_decimal_places) + 'e", ' + expression + ')'
-    e_answer, approximated = run_calc(expr)
+    e_expr = 'printf("%.' + str(num_decimal_places) + 'e", ' + expression + ')'
+    has_float = '.' in expression
+    e_answer, approximated = get_answer_in_exponential_form(e_expr, has_float)
+    return e_answer 
+
+
+def get_answer_in_exponential_form(expression, always_include_decimal_point):
+    e_answer, approximated = run_calc(expression)
 
     if e_answer == "0":
         e_answer = "0e+00"
@@ -187,7 +192,18 @@ def get_answer_key_in_exponential_form(expression, num_decimal_places):
         e_answer = re.sub('e(\d)$', r'e+0\1', e_answer)
         e_answer = re.sub('e(\d\d+)$', r'e+\1', e_answer)
 
-    return e_answer
+    if always_include_decimal_point and '.' not in e_answer:
+        parsed_e_re_result = re.search('^(-?\d+)(e[+-]\d+)$', e_answer)
+        e_answer = parsed_e_re_result.group(1) + ".0" + parsed_e_re_result.group(2)
+
+    return e_answer, approximated
+
+
+def get_answer_in_real_form(expression, always_include_decimal_point):
+    answer, approximated = run_calc(expression)
+    if always_include_decimal_point and re.match('^-?\d+$', answer):
+        answer += ".0"
+    return answer, approximated
 
 
 def run_calc(expression):
