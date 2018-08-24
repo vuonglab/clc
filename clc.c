@@ -180,12 +180,13 @@ static void pretty_print_answer(evaluation_result result)
 	}
 
 	remove_trailing_zeros_in_decimal_fraction(buffer, buf_size, result.expression_contains_floats);
+	char *p_answer = buffer;
 	if (strcmp(buffer, "-0") == 0)
-		strcpy(buffer, "0");
+		++p_answer; // "0"
 	if (strcmp(buffer, "-0.0") == 0)
-		strcpy(buffer, "0.0");
+		++p_answer; // "0.0"
 
-	puts(buffer);
+	puts(p_answer);
 }
 
 static int get_number_of_significant_digits_in_answer(evaluation_result result)
@@ -289,6 +290,17 @@ static void remove_trailing_zeros_in_decimal_fraction(char* buffer, int buf_size
 
 	if (e == NULL)
 		*p = '\0';
-	else
-		strcpy(p, e);
+	else {
+		const int ebuffer_len = 8;
+		const int e_len = strlen(e);
+		const int p_buffer_len = strlen(p) + 1;
+		if (e_len >= ebuffer_len || e_len >= p_buffer_len) {
+			puts("e buffer too small.");
+			exit(EXIT_FAILURE);
+		}
+
+		char ebuffer[ebuffer_len];
+		strncpy(ebuffer, e, ebuffer_len);
+		strncpy(p, ebuffer, p_buffer_len);
+	}
 }
