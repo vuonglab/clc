@@ -59,7 +59,7 @@ run_no_expression_test_cases()
 run_help_test_cases()
 {
 	local _usage=
-	_usage=$(printf "Usage: clc expression\nCommand-line elementary arithmetic calculator.\n\nExpression can contain +, -, *, x, /, (), and [].\n\nExamples:\n  clc [[6+2]x5-10]/3          Answer: 10\n  clc 52.1834*(5100+18)/85015 Answer: 3.1415")
+	_usage=$(printf "Usage: clc expression\nCommand-line elementary arithmetic calculator, version 1.00\n\nExpression can contain +, -, *, x, /, (), and [].\n\nExamples:\n  clc [[6+2]x5-10]/3          Answer: 10\n  clc 52.1834*(5100+18)/85015 Answer: 3.1415")
 
 	assert_is_equal 0 "$_usage" "-h"
 	assert_is_equal 0 "$_usage" "-h ignored"
