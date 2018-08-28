@@ -6,7 +6,7 @@ $(TARGET): clc.o evaluator.o
 	$(CC) clc.o evaluator.o -o $(TARGET)
 
 %.o: %.c evaluation_result.h
-	$(CC) -c $< -o $@
+	$(CC) -c -O2 $< -o $@
 
 clean:
 	rm -f *.o *.a $(TARGET)
