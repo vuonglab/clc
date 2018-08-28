@@ -12,15 +12,15 @@ static void show_usage_if_requested_and_exit(int argc, char **argv);
 static void show_precision_if_requested_and_exit(int argc, char **argv);
 static void snprintf_significant_digits_range(char *fp_type, char *buffer, int buf_size);
 static char* get_floating_point_type();
-static void reconstruct_command_ine_to_get_expression(char* expression, char **argv, int expression_buf_size);
+static void reconstruct_command_ine_to_get_expression(char *expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
 static void replace_char(char *str, char orig, char new);
 static void pretty_print_answer(evaluation_result result);
 static int get_number_of_significant_digits_in_answer(char *fp_type, bool expression_contains_floats, bool expression_contains_multiplication_or_division);
-static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer);
+static void snprintf_with_exit(char *buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
 static trailing_d_result get_number_of_trailing_d_followed_by_up_to_two_non_d(char *answer, char digit);
-static void remove_trailing_zeros_in_decimal_fraction(char* buffer, int buf_size, bool keep_decimal_point);
+static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size, bool keep_decimal_point);
 
 int main(int argc, char **argv)
 {
@@ -243,7 +243,7 @@ static int get_number_of_significant_digits_in_answer(char *fp_type, bool expres
 	}
 }
 
-static void snprintf_with_exit(char* buffer, int buf_size, char *fmt, int precision, long double answer)
+static void snprintf_with_exit(char *buffer, int buf_size, char *fmt, int precision, long double answer)
 {
 	int n = snprintf(buffer, buf_size, fmt, precision, answer);
 	if (n >= buf_size) {
@@ -304,7 +304,7 @@ static trailing_d_result get_number_of_trailing_d_followed_by_up_to_two_non_d(ch
 	return result;
 }
 
-static void remove_trailing_zeros_in_decimal_fraction(char* buffer, int buf_size, bool keep_decimal_point)
+static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size, bool keep_decimal_point)
 {
 	char *p = strchr(buffer, '.');
 	if (p == NULL)

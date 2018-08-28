@@ -13,7 +13,7 @@ static long double get_factor();
 
 static void report_invalid_expression_and_abort();
 static void get_next_non_whitespace_char();
-static void abort_if_expression_starts_with_two_unary_operators(char*);
+static void abort_if_expression_starts_with_two_unary_operators(char *);
 static void abort_if_not_end_of_expression();
 static void init(char *expression);
 static void skip_white_space();
