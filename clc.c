@@ -5,18 +5,25 @@
 
 #include "evaluation_result.h"
 
+typedef enum {
+	LONG_DOUBLE,
+	DOUBLE,
+	FLOAT,
+	UNKNOWN
+} floating_point_type;
+
 extern evaluation_result evaluate_expression(char *expression);
 
 static void abort_if_no_expression_on_command_line(int argc);
 static void show_usage_if_requested_and_exit(int argc, char **argv);
 static void show_precision_if_requested_and_exit(int argc, char **argv);
-static void snprintf_significant_digits_range(char *fp_type, char *buffer, int buf_size);
-static char* get_floating_point_type();
+static void snprintf_significant_digits_range(floating_point_type fp_type, char *buffer, int buf_size);
+static floating_point_type get_floating_point_type();
 static void reconstruct_command_ine_to_get_expression(char *expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
 static void replace_char(char *str, char orig, char new);
 static void pretty_print_answer(evaluation_result result);
-static int get_number_of_significant_digits_in_answer(char *fp_type, bool expression_contains_floats, bool expression_contains_multiplication_or_division);
+static int get_number_of_significant_digits_in_answer(floating_point_type fp_type, bool expression_contains_floats, bool expression_contains_multiplication_or_division);
 static void snprintf_with_exit(char *buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
 static trailing_d_result get_number_of_trailing_d_followed_by_up_to_two_non_d(char *answer, char digit);
@@ -74,17 +81,17 @@ static void show_precision_if_requested_and_exit(int argc, char **argv)
 	int buf_size = 3+1+2+1+2+1; // [ ] mm-nn
 
 	char long_double_buffer[buf_size];
-	snprintf_significant_digits_range("long double", long_double_buffer, buf_size);
+	snprintf_significant_digits_range(LONG_DOUBLE, long_double_buffer, buf_size);
 
 	char double_buffer[buf_size];
-	snprintf_significant_digits_range("double", double_buffer, buf_size);
+	snprintf_significant_digits_range(DOUBLE, double_buffer, buf_size);
 
 	printf("%s digits  %s digits\n", double_buffer, long_double_buffer); // [] 13-16  [X] 16-19
 
 	exit(EXIT_SUCCESS);
 }
 
-static void snprintf_significant_digits_range(char *fp_type, char *buffer, int buf_size)
+static void snprintf_significant_digits_range(floating_point_type fp_type, char *buffer, int buf_size)
 {
 	bool expression_contains_floats, expression_contains_multiplication_or_division;
 
@@ -96,8 +103,8 @@ static void snprintf_significant_digits_range(char *fp_type, char *buffer, int b
 	expression_contains_multiplication_or_division = false;
 	int num_decimal_places_most = get_number_of_significant_digits_in_answer(fp_type, expression_contains_floats, expression_contains_multiplication_or_division);
 
-	char *actual_floating_type = get_floating_point_type();
-	bool matchingPrecision = strcmp(actual_floating_type, fp_type) == 0;
+	floating_point_type actual_floating_type = get_floating_point_type();
+	bool matchingPrecision = (actual_floating_type == fp_type);
 	char checkbox_state = matchingPrecision ? 'X' : ' ';
 
 	int n = snprintf(buffer, buf_size, "[%c] %d-%d", checkbox_state, num_decimal_places_least, num_decimal_places_most);
@@ -111,16 +118,16 @@ static void snprintf_significant_digits_range(char *fp_type, char *buffer, int b
 	}
 }
 
-static char* get_floating_point_type()
+static floating_point_type get_floating_point_type()
 {
 	if (sizeof(long double) > sizeof(double))
-		return "long double";
+		return LONG_DOUBLE;
 	else if (sizeof(long double) == sizeof(double))
-		return "double";
+		return DOUBLE;
 	else if (sizeof(long double) == sizeof(float))
-		return "float";
+		return FLOAT;
 
-	return "unknown";
+	return UNKNOWN;
 }
 
 static void reconstruct_command_ine_to_get_expression(char *expression, char **argv, int expression_buf_size)
@@ -183,7 +190,7 @@ static void pretty_print_answer(evaluation_result result)
 
 	long double answer = result.answer;
 
-	char *fp_type = get_floating_point_type();
+	floating_point_type fp_type = get_floating_point_type();
 	int num_decimal_places_e_form = get_number_of_significant_digits_in_answer(fp_type, result.expression_contains_floats, result.expression_contains_multiplication_or_division)-1;
 
 	const int buf_size = 1536;
@@ -225,9 +232,9 @@ static void pretty_print_answer(evaluation_result result)
 	puts(p_answer);
 }
 
-static int get_number_of_significant_digits_in_answer(char *fp_type, bool expression_contains_floats, bool expression_contains_multiplication_or_division)
+static int get_number_of_significant_digits_in_answer(floating_point_type fp_type, bool expression_contains_floats, bool expression_contains_multiplication_or_division)
 {
-	if (strcmp(fp_type, "long double") == 0) {
+	if (fp_type == LONG_DOUBLE) {
 		// Number of digits is empirically determined from generating many
 		// random expressions and comparing answers from this program
 		// to calc (https://github.com/lcn2/calc), an arbitrary precision calculator.
