@@ -79,14 +79,13 @@ static void show_precision_if_requested_and_exit(int argc, char **argv)
 		return;
 
 	int buf_size = 3+1+2+1+2+1; // [ ] mm-nn
+	char buffer[buf_size];
 
-	char long_double_buffer[buf_size];
-	snprintf_significant_digits_range(LONG_DOUBLE, long_double_buffer, buf_size);
+	snprintf_significant_digits_range(LONG_DOUBLE, buffer, buf_size);
+	printf("%s digits", buffer); // "[ ] 13-16"
 
-	char double_buffer[buf_size];
-	snprintf_significant_digits_range(DOUBLE, double_buffer, buf_size);
-
-	printf("%s digits  %s digits\n", double_buffer, long_double_buffer); // [] 13-16  [X] 16-19
+	snprintf_significant_digits_range(DOUBLE, buffer, buf_size);
+	printf("  %s digits\n", buffer); // "  [X] 16-19"
 
 	exit(EXIT_SUCCESS);
 }
@@ -193,7 +192,7 @@ static void pretty_print_answer(evaluation_result result)
 	floating_point_type fp_type = get_floating_point_type();
 	int num_decimal_places_e_form = get_number_of_significant_digits_in_answer(fp_type, result.expression_contains_floats, result.expression_contains_multiplication_or_division)-1;
 
-	const int buf_size = 1536;
+	const int buf_size = 32;
 	char buffer[buf_size];
 	snprintf_with_exit(buffer, buf_size, "%.*Le", num_decimal_places_e_form, answer);
 
