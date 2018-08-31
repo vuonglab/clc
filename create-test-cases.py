@@ -127,7 +127,7 @@ def evaluate_expression_using_calc(expr, clc_answer):
 
     if full_answer_key == "Error 10001":
         full_answer_key += ": divide by zero"
-        if clc_answer == 'inf' or clc_answer == '-inf' or clc_answer == '-nan':
+        if clc_answer == 'inf' or clc_answer == '-inf' or clc_answer == 'nan' or clc_answer == '-nan':
             answer_key = clc_answer
         else:
             answer_key = "divide0"
