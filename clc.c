@@ -83,10 +83,10 @@ static void show_precision_if_requested_and_exit(int argc, char **argv)
 	int buf_size = 3+1+2+1+2+1; // [ ] mm-nn
 	char buffer[buf_size];
 
-	snprintf_significant_digits_range(LONG_DOUBLE, buffer, buf_size);
+	snprintf_significant_digits_range(DOUBLE, buffer, buf_size);
 	printf("%s digits", buffer); // "[ ] 13-16"
 
-	snprintf_significant_digits_range(DOUBLE, buffer, buf_size);
+	snprintf_significant_digits_range(LONG_DOUBLE, buffer, buf_size);
 	printf("  %s digits\n", buffer); // "  [X] 16-19"
 
 	exit(EXIT_SUCCESS);
