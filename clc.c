@@ -67,8 +67,10 @@ static void show_usage_if_requested_and_exit(int argc, char **argv)
 	puts("Expression can contain +, -, *, x, /, (), and [].");
 	puts("");
 	puts("Examples:");
-	puts("  clc [[6+2]x5-10]/3          Answer: 10");
-	puts("  clc 52.1834*(5100+18)/85015 Answer: 3.1415");
+	puts("  clc (8 + 5) / [14 - 14 + 1]   Answer: 13");
+	puts("  clc 1 + 14 / 4                Answer: 4.5");
+	puts("  clc 16 / 8 - 21               Answer: -19");
+	puts("  clc 3141592653/(10000*100000) Answer: 3.141592653");
 
 	exit(EXIT_SUCCESS);
 }
