@@ -245,9 +245,9 @@ static int get_number_of_significant_digits_in_answer(floating_point_type fp_typ
 			return expression_contains_floats ? 18 : 19;
 	} else {
 		if (expression_contains_multiplication_or_division)
-			return expression_contains_floats ? 16 : 17;
+			return expression_contains_floats ? 12 : 13;
 		else
-			return expression_contains_floats ? 18 : 19;
+			return expression_contains_floats ? 13 : 14;
 	}
 }
 
