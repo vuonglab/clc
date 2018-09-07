@@ -98,7 +98,7 @@ def generate_script_function(output_filename, expressions, verbose):
 
 
 def evaluate_expression_using_clc(expr):
-    result = subprocess.run(['./clc', expr], stdout=subprocess.PIPE)
+    result = subprocess.run(['../clc', expr], stdout=subprocess.PIPE)
     answer = re.sub('\n$', '', result.stdout.decode('utf-8'))
     exit_code = result.returncode
     # is_float() handles +/-inf and +/-nan
