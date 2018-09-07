@@ -22,7 +22,7 @@ static floating_point_type get_floating_point_type();
 static void reconstruct_command_ine_to_get_expression(char *expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
 static void replace_char(char *str, char orig, char new);
-static void pretty_print_answer(evaluation_result result);
+static void output_answer(evaluation_result result);
 static int get_number_of_significant_digits_in_answer(floating_point_type fp_type, bool expression_contains_floats, bool expression_contains_multiplication_or_division);
 static void snprintf_with_exit(char *buffer, int buf_size, char *fmt, int precision, long double answer);
 static int get_mantissa(char *buffer);
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
 	evaluation_result result = evaluate_expression(expression);
 	
-	pretty_print_answer(result);
+	output_answer(result);
 
 	exit(EXIT_SUCCESS);
 }
@@ -176,19 +176,8 @@ static void replace_char(char *str, char orig, char new)
 		*match++ = new;
 }
 
-static void pretty_print_answer(evaluation_result result)
+static void output_answer(evaluation_result result)
 {
-	// https://www.tutorialspoint.com/cprogramming/c_data_types.htm
-	// float: 6 decimal places; double: 15 decimal places; long double: 19 decimal places
-
-	// warning: integer constant is so large that it is unsigned
-	// -9522868949551080827L // len 19, without the negative sign - overflow
-	// 10000000000000000000L // len 20 - overflow
-	// 9999999999999999999L // len 19 - overflow
-
-	// No warning about integer constant too large
-	// 9000000000000000000L // no overflow
-
 	long double answer = result.answer;
 
 	floating_point_type fp_type = get_floating_point_type();
