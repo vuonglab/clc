@@ -2,9 +2,9 @@
 
 """
 This Python script reads in a file containing elementary math expressions,
-calculates the expected answers using another program, and generates a
-sh-compatible script function to call clc to test clc produces the correct
-answers.
+calculates the expected answers using another program named calc, and
+generates a sh-compatible script function to call clc to test that clc
+produces the correct answers.
 
 Syntax: ./create-test-cases.py [-v, --verbose] expressions_filename
 
