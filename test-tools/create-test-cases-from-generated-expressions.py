@@ -66,7 +66,8 @@ def generate_script_function(output_filename, expressions, verbose):
     basename = os.path.splitext(os.path.basename(output_filename))[0]
 
     with open(output_filename, 'w') as script_file:
-        script_file.write("run_" + basename + "()\n")
+        function_name = generate_function_name(basename)
+        script_file.write(function_name + "()\n")
         script_file.write("{\n")
 
         for expr in expressions:
@@ -97,8 +98,51 @@ def generate_script_function(output_filename, expressions, verbose):
     return commented_out_expr_count
 
 
+def generate_function_name(filename):
+    function_name = "run_"
+
+    regex_result = \
+        re.search('^(a|s|m|d|as|md|asmd)-(i|f|if)99-expr$', filename)
+    if regex_result == None:
+        function_name += filename
+        return function_name
+
+    operators = regex_result.group(1)
+    numbers = regex_result.group(2)
+
+    if numbers == "i":
+        function_name += "integer"
+    elif numbers == "f":
+        function_name += "decimal"
+    elif numbers == "if":
+        function_name += "integer_and_decimal"
+    
+    function_name += "_"
+
+    if operators == "a":
+        function_name += "addition"
+    elif operators == "s":
+        function_name += "subtraction"
+    elif operators == "m":
+        function_name += "multiplication"
+    elif operators == "d":
+        function_name += "division"
+    elif operators == "as":
+        function_name += "addition_and_subtraction"
+    elif operators == "md":
+        function_name += "multiplication_and_division"
+    elif operators == "asmd":
+        function_name += "addition_subtraction_multiplication_and_division"
+
+    function_name += "_tests"
+
+    return function_name
+
+
 def evaluate_expression_using_clc(expr):
-    result = subprocess.run(['../clc', expr], stdout=subprocess.PIPE)
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    clc_full_path = script_path + '/../clc'
+    result = subprocess.run([clc_full_path, expr], stdout=subprocess.PIPE)
     answer = re.sub('\n$', '', result.stdout.decode('utf-8'))
     exit_code = result.returncode
     # is_float() handles +/-inf and +/-nan
