@@ -1169,41 +1169,6 @@ run_division_by_zero_test_cases()
 	assert_is_equal 0 -nan "([-9.3311 - 0.370 + -0.7-(-0.35)]/[-0.75+[-0.5410-1.260]] - -0.2) / (-3.7+0.7 * -0.458 + -0.31+0.8785)x-0.470x(377.24 / 20.2 / (-888.7 + -346.24)+0.15 + 0.0) x -5.20 x -6582.8/7.7714 / 89.98x-8958.59/-0.6 / [(-0.3-0.563)/0.3 / 0.0x(-0.3-450149.7/-30.50/-8549.9 - 0.7 + -586.8) / (-9.942 - 0.50 / -8.2809)x-24.4-[[-6.114 - 1.62 / 0.0/0.15] / -0.6 + 0.601 / -917.06x80.80 / -6.6198 + -1.5x9.870/2.7/-0.7]/[-0.28394/0.65493 + -0.13139-[-0.754] - (0.8 - -0.7) * -2.5]]*0.370"
 }
 
-run_addition_test_cases()
-{
-	shift 0
-}
-
-run_subtraction_test_cases()
-{
-	shift 0
-}
-
-run_addition_subtraction_test_cases()
-{
-	shift 0
-}
-
-run_multiplication_test_cases()
-{
-	shift 0
-}
-
-run_division_test_cases()
-{
-	shift 0
-}
-
-run_multiplication_division_test_cases()
-{
-	shift 0
-}
-
-run_addition_subtraction_multiplication_division_test_cases()
-{
-	shift 0
-}
-
 run_significant_digits_test_cases()
 {
 	run_significant_digits_test_cases_integer_addition_and_subtraction
@@ -1251,16 +1216,6 @@ run_expression_test_cases()
 	run_unusual_decimal_test_cases
 
 	run_division_by_zero_test_cases
-
-	run_addition_test_cases
-	run_subtraction_test_cases
-	run_addition_subtraction_test_cases
-
-	run_multiplication_test_cases
-	run_division_test_cases
-	run_multiplication_division_test_cases
-
-	run_addition_subtraction_multiplication_division_test_cases
 }
 
 run_all_test_cases()
