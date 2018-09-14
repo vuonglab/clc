@@ -168,13 +168,18 @@ def evaluate_expression_using_calc(expr, clc_answer):
     has_float = '.' in expr
     if 'e' in clc_answer:
         e_expr = 'printf("%e", ' + expr + ')'
-        full_answer_key, approximated = get_answer_in_exponential_form(e_expr, has_float)
+        full_answer_key, approximated = get_answer_in_exponential_form(
+            e_expr, has_float
+        )
     else:
-        full_answer_key, approximated = get_answer_in_real_form(expr, has_float)
+        full_answer_key, approximated = get_answer_in_real_form(
+            expr, has_float
+        )
 
     if full_answer_key == "Error 10001":
         full_answer_key += ": divide by zero"
-        if clc_answer == 'inf' or clc_answer == '-inf' or clc_answer == 'nan' or clc_answer == '-nan':
+        if clc_answer == 'inf' or clc_answer == '-inf' \
+            or clc_answer == 'nan' or clc_answer == '-nan':
             answer_key = clc_answer
         else:
             answer_key = "divide0"
@@ -241,7 +246,8 @@ def get_answer_in_exponential_form(expression, always_include_decimal_point):
 
     if always_include_decimal_point and '.' not in e_answer:
         parsed_e_re_result = re.search('^(-?\d+)(e[+-]\d+)$', e_answer)
-        e_answer = parsed_e_re_result.group(1) + ".0" + parsed_e_re_result.group(2)
+        e_answer = parsed_e_re_result.group(1) + ".0" \
+            + parsed_e_re_result.group(2)
 
     return e_answer, approximated
 
