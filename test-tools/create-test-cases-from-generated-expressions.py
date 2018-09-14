@@ -70,10 +70,12 @@ def generate_script_function(output_filename, expressions, verbose):
         script_file.write(function_name + "()\n")
         script_file.write("{\n")
 
-        for expr in expressions:
+        for idx, expr in enumerate(expressions):
             clc_answer, exit_code = evaluate_expression_using_clc(expr)
             full_answer_key, answer_key, approximated = \
                 evaluate_expression_using_calc(expr, clc_answer)
+
+            last_expression = idx+1 == len(expressions)
 
             if clc_answer == answer_key:
                 if clc_answer == full_answer_key:
@@ -84,12 +86,13 @@ def generate_script_function(output_filename, expressions, verbose):
                 else:
                     write_out_expr_test_case_rounded_key(
                         script_file, expr, full_answer_key, approximated,
-                        answer_key, exit_code, verbose
+                        answer_key, exit_code, verbose, not last_expression
                     )
             else:
                 comment_out_expr_test_case(
                     script_file, expr, full_answer_key, approximated,
-                    answer_key, clc_answer, exit_code, verbose
+                    answer_key, clc_answer, exit_code, verbose,
+                    not last_expression
                 )
                 commented_out_expr_count += 1
 
@@ -283,7 +286,7 @@ def write_out_expr_test_case(file, expr, answer_key, approximated, exit_code,
 
 def write_out_expr_test_case_rounded_key(file, expr, full_answer_key,
                                          approximated, answer_key, exit_code,
-                                         verbose):
+                                         verbose, write_second_blank_line):
     file.write('\n')
     file.write('#\t             Key: ' + full_answer_key)
     if approximated:
@@ -298,11 +301,13 @@ def write_out_expr_test_case_rounded_key(file, expr, full_answer_key,
     file.write(answer_key + " ")
     file.write('"' + expr + '"\n')
 
-    file.write('\n')
+    if write_second_blank_line:
+        file.write('\n')
 
 
 def comment_out_expr_test_case(file, expr, full_answer_key, approximated,
-                               answer_key, answer, exit_code, verbose):
+                               answer_key, answer, exit_code, verbose,
+                               write_second_blank_line):
     file.write('\n')
     if full_answer_key != answer_key or approximated:
         file.write("#\t             Key: ")
@@ -323,7 +328,9 @@ def comment_out_expr_test_case(file, expr, full_answer_key, approximated,
     file.write(str(exit_code) + " ")
     file.write(answer_key + " ")
     file.write('"' + expr + '"\n')
-    file.write('\n')
+
+    if write_second_blank_line:
+        file.write('\n')
 
 
 def number_of_significant_digits(answer):
