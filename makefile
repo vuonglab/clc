@@ -12,7 +12,7 @@ clean:
 	rm -f *.o *.a $(TARGET)
 
 test: $(TARGET)
-	./tests.sh
+	./tests-long-double.sh
 
 install: $(TARGET)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
