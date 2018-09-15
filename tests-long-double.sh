@@ -105,7 +105,7 @@ run_help_test_cases()
 run_display_precision_test_cases()
 {
 	local _precision
-	_precision=$(./clc --precision)
+	_precision='[ ] 13-15 digits  [X] 16-19 digits'
 
 	assert_is_equal 0 "$_precision" "-p"
 	assert_is_equal 0 "$_precision" "-p --precision"
