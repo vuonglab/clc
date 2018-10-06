@@ -145,6 +145,9 @@ static void reconstruct_command_ine_to_get_expression(char *expression, char **a
 		strncat(expression, *argv, expr_buf_size_remaining);
 		expr_buf_size_remaining -= strlen(*argv);
 
+		if (expr_buf_size_remaining < 0)
+			break;
+
 		if (*(argv+1) == NULL)
 			break;
 
