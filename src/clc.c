@@ -31,8 +31,8 @@ static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size
 
 int main(int argc, char **argv)
 {
-	const int expression_buf_size = 511+1;
-	char expression[expression_buf_size];
+	char expression[511+1];
+	const int expression_buf_size = sizeof(expression)/sizeof(expression[0]);
 
 	abort_if_no_expression_on_command_line(argc);
 	show_usage_if_requested_and_exit(argc, argv);
@@ -80,8 +80,8 @@ static void show_precision_if_requested_and_exit(int argc, char **argv)
 	if (argv[1] == NULL || (strcmp(argv[1], "-p") != 0 && strcmp(argv[1], "--precision") != 0))
 		return;
 
-	int buf_size = 3+1+2+1+2+1; // [ ] mm-nn
-	char buffer[buf_size];
+	char buffer[3+1+2+1+2+1]; // [ ] mm-nn
+	int buf_size = sizeof(buffer)/sizeof(buffer[0]);
 
 	snprintf_significant_digits_range(DOUBLE, buffer, buf_size);
 	printf("%s digits", buffer); // "[ ] 13-16"
@@ -186,8 +186,8 @@ static void output_answer(evaluation_result result)
 	floating_point_type fp_type = get_floating_point_type();
 	int num_decimal_places_e_form = get_number_of_significant_digits_in_answer(fp_type, result.expression_contains_floats, result.expression_contains_multiplication_or_division)-1;
 
-	const int buf_size = 32;
-	char buffer[buf_size];
+	char buffer[32];
+	const int buf_size = sizeof(buffer)/sizeof(buffer[0]);
 	snprintf_with_exit(buffer, buf_size, "%.*Le", num_decimal_places_e_form, answer);
 
 	if ((strcmp(buffer, "inf") != 0 && strcmp(buffer, "-inf") != 0) &&
@@ -334,7 +334,8 @@ static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size
 	if (e == NULL)
 		*p = '\0';
 	else {
-		const int ebuffer_len = 8;
+		char ebuffer[8];
+		const int ebuffer_len = sizeof(ebuffer)/sizeof(ebuffer[0]);
 		const int e_len = strlen(e);
 		const int p_buffer_len = strlen(p) + 1;
 		if (e_len >= ebuffer_len || e_len >= p_buffer_len) {
@@ -342,7 +343,6 @@ static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size
 			exit(EXIT_FAILURE);
 		}
 
-		char ebuffer[ebuffer_len];
 		strncpy(ebuffer, e, ebuffer_len);
 		strncpy(p, ebuffer, p_buffer_len);
 	}
