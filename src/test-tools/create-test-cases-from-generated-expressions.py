@@ -6,7 +6,8 @@ calculates the expected answers using another program named calc, and
 generates a sh-compatible script function to call clc to test that clc
 produces the correct answers.
 
-Syntax: ./create-test-cases.py [-v, --verbose] expressions_filename
+Syntax: ./create-test-cases-from-generated-expressions.py \
+        [-v, --verbose] expressions_filename
 
 Dependencies:
 calc - C-style arbitrary precision calculator (https://github.com/lcn2/calc);
