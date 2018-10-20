@@ -28786,15 +28786,8 @@ run_input_output_test_cases()
 	run_pretty_print_test_cases
 }
 
-run_expression_test_cases()
+run_generated_expression_test_cases()
 {
-	run_unary_operator_test_cases
-	run_multiple_unary_operators_at_beginning_of_expression_test_cases
-
-	run_unusual_decimal_test_cases
-
-	run_division_by_zero_test_cases
-
 	run_decimal_addition_tests
 	run_integer_addition_tests
 	run_integer_and_decimal_addition_tests
@@ -28822,6 +28815,18 @@ run_expression_test_cases()
 	run_decimal_addition_subtraction_multiplication_and_division_tests
 	run_integer_addition_subtraction_multiplication_and_division_tests
 	run_integer_and_decimal_addition_subtraction_multiplication_and_division_tests
+}
+
+run_expression_test_cases()
+{
+	run_unary_operator_test_cases
+	run_multiple_unary_operators_at_beginning_of_expression_test_cases
+
+	run_unusual_decimal_test_cases
+
+	run_division_by_zero_test_cases
+
+	run_generated_expression_test_cases
 }
 
 run_all_test_cases()

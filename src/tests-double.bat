@@ -28821,14 +28821,7 @@ exit /b 0
 	exit /b 0
 
 
-:run_expression_test_cases
-	call :run_unary_operator_test_cases
-	call :run_multiple_unary_operators_at_beginning_of_expression_test_cases
-
-	call :run_unusual_decimal_test_cases
-
-	call :run_division_by_zero_test_cases
-
+:run_generated_expression_test_cases
 	call :run_decimal_addition_tests
 	call :run_integer_addition_tests
 	call :run_integer_and_decimal_addition_tests
@@ -28856,6 +28849,17 @@ exit /b 0
 	call :run_decimal_addition_subtraction_multiplication_and_division_tests
 	call :run_integer_addition_subtraction_multiplication_and_division_tests
 	call :run_integer_and_decimal_addition_subtraction_multiplication_and_division_tests
+	exit /b 0
+
+:run_expression_test_cases
+	call :run_unary_operator_test_cases
+	call :run_multiple_unary_operators_at_beginning_of_expression_test_cases
+
+	call :run_unusual_decimal_test_cases
+
+	call :run_division_by_zero_test_cases
+	
+	call :run_generated_expression_test_cases
 	exit /b 0
 
 
