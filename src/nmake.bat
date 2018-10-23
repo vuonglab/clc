@@ -13,5 +13,6 @@ call tests-double.bat
 exit /b
 
 :clean
-del *.obj clc.exe
+if exist *.obj (del *.obj)
+if exist clc.exe (del clc.exe)
 exit /b
