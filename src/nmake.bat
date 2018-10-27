@@ -4,7 +4,7 @@ if "%1" == "test" goto test
 if "%1" == "clean" goto clean
 
 :build
-cl /Os /MD clc.c evaluator.c
+cl /O1 /MD clc.c evaluator.c
 exit /b
 
 :test
