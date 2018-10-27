@@ -1,49 +1,41 @@
 #!/bin/sh
 
-cat decimal_addition.tests >all.tests
-printf '\n' >>all.tests
-cat integer_addition.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_and_decimal_addition.tests >>all.tests
-printf '\n' >>all.tests
+combine_test_cases()
+{
+    local _short_filename=$1.tests
+    local _long_filename=$2.tests
 
-cat decimal_subtraction.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_subtraction.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_and_decimal_subtraction.tests >>all.tests
-printf '\n' >>all.tests
+	local _filename=$_long_filename
+	[ -e $_short_filename ] && _filename=$_short_filename
 
-cat decimal_multiplication.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_multiplication.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_and_decimal_multiplication.tests >>all.tests
-printf '\n' >>all.tests
+	cat $_filename >>combined.tests
+	printf '\n' >>combined.tests
+}
 
-cat decimal_division.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_division.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_and_decimal_division.tests >>all.tests
-printf '\n' >>all.tests
+combine_test_cases a-f99-expr decimal_addition
+combine_test_cases a-i99-expr integer_addition
+combine_test_cases a-if99-expr integer_and_decimal_addition
 
-cat decimal_addition_and_subtraction.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_addition_and_subtraction.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_and_decimal_addition_and_subtraction.tests >>all.tests
-printf '\n' >>all.tests
+combine_test_cases s-f99-expr decimal_subtraction
+combine_test_cases s-i99-expr integer_subtraction
+combine_test_cases s-if99-expr integer_and_decimal_subtraction
 
-cat decimal_multiplication_and_division.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_multiplication_and_division.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_and_decimal_multiplication_and_division.tests >>all.tests
-printf '\n' >>all.tests
+combine_test_cases m-f99-expr decimal_multiplication
+combine_test_cases m-i99-expr integer_multiplication
+combine_test_cases m-if99-expr integer_and_decimal_multiplication
 
-cat decimal_addition_subtraction_multiplication_and_division.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_addition_subtraction_multiplication_and_division.tests >>all.tests
-printf '\n' >>all.tests
-cat integer_and_decimal_addition_subtraction_multiplication_and_division.tests >>all.tests
+combine_test_cases d-f99-expr decimal_division
+combine_test_cases d-i99-expr integer_division
+combine_test_cases d-if99-expr integer_and_decimal_division
+
+combine_test_cases as-f99-expr decimal_addition_and_subtraction
+combine_test_cases as-i99-expr integer_addition_and_subtraction
+combine_test_cases as-if99-expr integer_and_decimal_addition_and_subtraction
+
+combine_test_cases md-f99-expr decimal_multiplication_and_division
+combine_test_cases md-i99-expr integer_multiplication_and_division
+combine_test_cases md-if99-expr integer_and_decimal_multiplication_and_division
+
+combine_test_cases asmd-f99-expr decimal_addition_subtraction_multiplication_and_division
+combine_test_cases asmd-i99-expr integer_addition_subtraction_multiplication_and_division
+combine_test_cases asmd-if99-expr integer_and_decimal_addition_subtraction_multiplication_and_division
