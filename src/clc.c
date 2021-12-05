@@ -310,7 +310,7 @@ static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size
 	if (p == NULL)
 		return;
 
-	int len = strlen(p);
+	unsigned long len = strlen(p);
 
 	char *e = strchr(buffer, 'e');
 	if (e != NULL) {
@@ -320,7 +320,7 @@ static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size
 	}
 
 	p += len;
-	int i;
+	unsigned long i;
 	for (i=0; i<len; i++, p--)
 		if (*(p-1) != '0' && *(p-1) != '.')
 			break;
@@ -336,8 +336,8 @@ static void remove_trailing_zeros_in_decimal_fraction(char *buffer, int buf_size
 	else {
 		char ebuffer[8];
 		const int ebuffer_len = sizeof(ebuffer)/sizeof(ebuffer[0]);
-		const int e_len = strlen(e);
-		const int p_buffer_len = strlen(p) + 1;
+		const unsigned long e_len = strlen(e);
+		const unsigned long p_buffer_len = strlen(p) + 1;
 		if (e_len >= ebuffer_len || e_len >= p_buffer_len) {
 			puts("e buffer too small.");
 			exit(EXIT_FAILURE);
