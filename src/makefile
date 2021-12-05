@@ -3,7 +3,7 @@ DEPS = evaluation_result.h
 TARGET = clc
 
 CC = cc
-OPTS = -O2
+OPTS = -O2 -Wall -Wstrict-prototypes
 LIBS =
 
 INSTALLDIR = /usr/local
