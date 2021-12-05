@@ -1,22 +1,32 @@
+SRCS = clc.c evaluator.c
+DEPS = evaluation_result.h 
 TARGET = clc
+
 CC = cc
-PREFIX = /usr/local
+OPTS = -O2
+LIBS =
 
-$(TARGET): clc.o evaluator.o
-	$(CC) clc.o evaluator.o -o $(TARGET)
+INSTALLDIR = /usr/local
 
-%.o: %.c evaluation_result.h
-	$(CC) -c -O2 $< -o $@
+OBJS = $(SRCS:.c=.o)
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) $(LIBS)
+
+%.o: %.c $(DEPS)
+	$(CC) $(OPTS) -c $< -o $@
 
 clean:
-	rm -f *.o *.a $(TARGET)
+	rm -f $(OBJS) $(TARGET)
 
 test: $(TARGET)
 	./tests.sh
 
 install: $(TARGET)
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp $(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	mkdir -p $(DESTDIR)$(INSTALLDIR)/bin
+	cp $(TARGET) $(DESTDIR)$(INSTALLDIR)/bin/$(TARGET)
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	rm -f $(DESTDIR)$(INSTALLDIR)/bin/$(TARGET)
