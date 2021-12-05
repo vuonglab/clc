@@ -1,0 +1,10 @@
+import("//build/components.gni")
+
+executable("bin") {
+  output_name = "clc"
+  sources = [ "clc.c", "evaluator.c" ]
+}
+
+fuchsia_shell_package("clc") {
+  deps = [ ":bin" ]
+}
