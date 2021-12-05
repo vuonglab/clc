@@ -18,7 +18,7 @@ static void abort_if_no_expression_on_command_line(int argc);
 static void show_usage_if_requested_and_exit(int argc, char **argv);
 static void show_precision_if_requested_and_exit(int argc, char **argv);
 static void snprintf_significant_digits_range(floating_point_type fp_type, char *buffer, int buf_size);
-static floating_point_type get_floating_point_type();
+static floating_point_type get_floating_point_type(void);
 static void reconstruct_command_ine_to_get_expression(char *expression, char **argv, int expression_buf_size);
 static void replace_brackets_and_x_in_expression_with_parentheses_and_asterisk(char *expression);
 static void replace_char(char *str, char orig, char new);

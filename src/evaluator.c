@@ -5,18 +5,18 @@
 
 #include "evaluation_result.h"
 
-static void get_next_char();
-static long double start();
-static long double get_number();
-static long double get_term();
-static long double get_factor();
+static void get_next_char(void);
+static long double start(void);
+static long double get_number(void);
+static long double get_term(void);
+static long double get_factor(void);
 
-static void report_invalid_expression_and_abort();
-static void get_next_non_whitespace_char();
+static void report_invalid_expression_and_abort(void);
+static void get_next_non_whitespace_char(void);
 static void abort_if_expression_starts_with_two_unary_operators(char *);
-static void abort_if_not_end_of_expression();
+static void abort_if_not_end_of_expression(void);
 static void init(char *expression);
-static void skip_white_space();
+static void skip_white_space(void);
 
 char look; // lookahead character
 char *_expression;
