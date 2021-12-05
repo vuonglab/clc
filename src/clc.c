@@ -188,7 +188,7 @@ static void output_answer(evaluation_result result)
 
 	char buffer[32];
 	const int buf_size = sizeof(buffer)/sizeof(buffer[0]);
-	snprintf_with_exit(buffer, buf_size, "%.*Le", num_decimal_places_e_form, answer);
+	snprintf_with_exit(buffer, buf_size, (char *)"%.*Le", num_decimal_places_e_form, answer);
 
 	if ((strcmp(buffer, "inf") != 0 && strcmp(buffer, "-inf") != 0) &&
 		(strcmp(buffer, "nan") != 0 && strcmp(buffer, "-nan") != 0)) {
@@ -197,21 +197,21 @@ static void output_answer(evaluation_result result)
 			int num_decimal_places = num_decimal_places_e_form - mantissa;
 			if (num_decimal_places == 0)
 				num_decimal_places = (result.expression_contains_floats ? 1 : 0);
-			snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places, answer);
+			snprintf_with_exit(buffer, buf_size, (char *)"%.*Lf", num_decimal_places, answer);
 			trailing_d_result nines_result = get_number_of_trailing_d_followed_by_up_to_two_non_d(buffer, '9');
 			int number_of_nines = nines_result.d_count + nines_result.non_d_count;
 			if (8 <= number_of_nines && number_of_nines <= num_decimal_places) {
 				int num_decimals = num_decimal_places - number_of_nines;
 				if (num_decimals == 0)
 					num_decimals = (result.expression_contains_floats ? 1 : 0);
-				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimals, answer);
+				snprintf_with_exit(buffer, buf_size, (char *)"%.*Lf", num_decimals, answer);
 			}
 
 			trailing_d_result zeros_result = get_number_of_trailing_d_followed_by_up_to_two_non_d(buffer, '0');
 			int number_of_zeros = zeros_result.d_count + zeros_result.non_d_count;
 			// Don't truncate -9170.0000000000029 and -508.00000000000087. 
 			if (zeros_result.non_d_count > 0 && 5 <= number_of_zeros && number_of_zeros <= num_decimal_places-1)
-				snprintf_with_exit(buffer, buf_size, "%.*Lf", num_decimal_places-number_of_zeros, answer);
+				snprintf_with_exit(buffer, buf_size, (char *)"%.*Lf", num_decimal_places-number_of_zeros, answer);
 		}
 	}
 
